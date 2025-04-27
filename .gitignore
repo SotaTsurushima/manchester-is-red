@@ -20,5 +20,4 @@
 
 # Env files
 .env
-/frontend/.env
 /backend/.env
