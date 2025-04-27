@@ -38,6 +38,7 @@ services:
       - ./frontend:/app
     ports:
       - "3000:3000"
+    command: yarn dev --host 0.0.0.0
     depends_on:
       - backend
 
