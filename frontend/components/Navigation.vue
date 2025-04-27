@@ -17,10 +17,11 @@
         'list-none flex gap-1', 
         menuOpen ? 'flex flex-col absolute top-20 left-0 w-full bg-red-700 p-5' : 'hidden md:flex justify-start w-full'
       ]">
-        <li><a href="/" class="text-white font-semibold ml-2 py-2 px-4 rounded hover:bg-yellow-500 block">Home</a></li>
-        <li><a href="/matches" class="text-white font-semibold py-2 px-4 rounded hover:bg-yellow-500 block">Matches</a></li>
-        <li><a href="/news" class="text-white font-semibold py-2 px-4 rounded hover:bg-yellow-500 block">News</a></li>
-        <li><a href="/team" class="text-white font-semibold py-2 px-4 rounded hover:bg-yellow-500 block">Team</a></li>
+        <li v-for="item in navItems" :key="item.text">
+          <a :href="item.href" class="text-white font-semibold ml-2 py-2 px-4 rounded hover:bg-yellow-500 block">
+            {{ item.text }}
+          </a>
+        </li>
       </ul>
     </div>
   </nav>
@@ -28,6 +29,16 @@
 
 <script setup>
 import { ref } from 'vue'
+
+// ナビゲーション項目の配列を定義
+const navItems = [
+  { href: '/', text: 'Home' },
+  { href: '/matches', text: 'Matches' },
+  { href: '/news', text: 'News' },
+  { href: '/transfer', text: 'Transfer' },
+  { href: '/team', text: 'Team' },
+  { href: '/injury', text: 'Injury Report' },
+]
 
 const menuOpen = ref(false)
 
