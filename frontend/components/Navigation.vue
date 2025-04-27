@@ -1,146 +1,37 @@
 <template>
-  <nav class="navbar">
-    <div class="navbar-container">
-      <a href="/" class="logo">
-        <img src="https://assets.manutd.com/AssetPicker/images/0/0/3/2/197240/Header-Logo1500994616801.png" alt="Manchester United Club Crest">
+  <nav class="bg-red-700 text-white p-3 flex justify-between items-center font-sans">
+    <div class="flex items-center w-full mx-auto">
+      <a href="/" class="mr-0">
+        <img
+          src="https://assets.manutd.com/AssetPicker/images/0/0/3/2/197240/Header-Logo1500994616801.png"
+          alt="Manchester United Club Crest"
+          class="w-16 h-16"
+        />
       </a>
-      <div class="menu-toggle" @click="toggleMenu">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
+      <div class="flex flex-col gap-1 cursor-pointer md:hidden" @click="toggleMenu">
+        <span class="w-6 h-1 bg-white rounded"></span>
+        <span class="w-6 h-1 bg-white rounded"></span>
+        <span class="w-6 h-1 bg-white rounded"></span>
       </div>
-      <ul :class="{'nav-links': true, 'active': menuOpen}">
-        <li><a href="/">Home</a></li>
-        <li><a href="/matches">Matches</a></li>
-        <li><a href="/news">News</a></li>
-        <li><a href="/team">Team</a></li>
-        <li><a href="/tickets">Tickets</a></li>
-        <li><a href="/store">Store</a></li>
+      <ul :class="[ 
+        'list-none flex gap-1', 
+        menuOpen ? 'flex flex-col absolute top-20 left-0 w-full bg-red-700 p-5' : 'hidden md:flex justify-start w-full'
+      ]">
+        <li><a href="/" class="text-white font-semibold ml-2 py-2 px-4 rounded hover:bg-yellow-500 block">Home</a></li>
+        <li><a href="/matches" class="text-white font-semibold py-2 px-4 rounded hover:bg-yellow-500 block">Matches</a></li>
+        <li><a href="/news" class="text-white font-semibold py-2 px-4 rounded hover:bg-yellow-500 block">News</a></li>
+        <li><a href="/team" class="text-white font-semibold py-2 px-4 rounded hover:bg-yellow-500 block">Team</a></li>
       </ul>
-      <div class="auth-links">
-        <a href="/login">Login</a>
-        <a href="/signup">Sign Up</a>
-      </div>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-const menuOpen = ref(false);
+const menuOpen = ref(false)
 
 const toggleMenu = () => {
-  menuOpen.value = !menuOpen.value;
-};
+  menuOpen.value = !menuOpen.value
+}
 </script>
-
-<style scoped>
-.navbar {
-  background-color: #e10017;
-  color: white;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: Arial, sans-serif;
-}
-
-.navbar-container {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.navbar .logo img {
-  width: 60px;  /* デフォルトのロゴサイズ */
-  height: 60px;  /* 高さ自動調整 */
-}
-
-.nav-links {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-}
-
-.nav-links li a {
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 10px 15px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-.nav-links li a:hover {
-  background-color: #f0a500;
-}
-
-.auth-links {
-  display: flex;
-  gap: 15px;
-}
-
-.auth-links a {
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.menu-toggle {
-  display: none;
-  flex-direction: column;
-  gap: 4px;
-  cursor: pointer;
-}
-
-.menu-toggle .bar {
-  width: 25px;
-  height: 3px;
-  background-color: white;
-  border-radius: 3px;
-}
-
-@media (max-width: 768px) {
-  .navbar .logo img {
-    width: 100px;  /* 小さいスクリーン用にロゴをさらに小さくする */
-  }
-
-  /* メニューが開いたときのアニメーション調整 */
-  .nav-links.active {
-    display: flex;
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out;
-  }
-  .navbar-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .nav-links {
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    padding-left: 20px;
-    display: none;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-  }
-
-  .nav-links li a {
-    padding: 10px;
-    width: 100%;
-    text-align: left;
-  }
-
-  .auth-links {
-    margin-top: 15px;
-  }
-
-  .menu-toggle {
-    display: flex;
-  }
-}
-</style>
