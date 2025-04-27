@@ -1,6 +1,6 @@
-up:
+u:
 	docker-compose up
-build:
+b:
 	docker-compose build
 no-cache:
 	docker-compose build --no-cache --force-rm
@@ -9,7 +9,7 @@ remake:
 	@make up
 stop:
 	docker-compose stop
-down:
+d:
 	docker-compose down --remove-orphans
 restart:
 	@make down
