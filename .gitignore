@@ -1,0 +1,24 @@
+# .gitignore
+
+# Docker
+*.pid
+/tmp
+/log
+/.docker
+
+# Rails
+/vendor/bundle
+/log/*
+/tmp/*
+/storage/*
+/public/assets
+
+# Node.js / Nuxt
+/frontend/node_modules
+/frontend/.output
+/frontend/.nuxt
+
+# Env files
+.env
+/frontend/.env
+/backend/.env
