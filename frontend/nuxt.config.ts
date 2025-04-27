@@ -7,4 +7,7 @@ export default defineNuxtConfig({
       },
     },
   },
+  modules: [
+    '@nuxtjs/tailwindcss', // ← 追加するだけ！
+  ]
 })
