@@ -8,11 +8,8 @@
           class="w-16 h-16"
         />
       </a>
-      <div class="flex flex-col gap-1 cursor-pointer md:hidden" @click="toggleMenu">
-        <span class="w-6 h-1 bg-white rounded"></span>
-        <span class="w-6 h-1 bg-white rounded"></span>
-        <span class="w-6 h-1 bg-white rounded"></span>
-      </div>
+      <div class="flex flex-col ml-3 gap-1 cursor-pointer md:hidden" @click="toggleMenu">
+        <span v-for="index in 3" :key="index" class="w-6 h-1 bg-white rounded"></span>      </div>
       <ul :class="[ 
         'list-none flex gap-1', 
         menuOpen ? 'flex flex-col absolute top-20 left-0 w-full bg-red-700 p-5' : 'hidden md:flex justify-start w-full'
@@ -30,14 +27,17 @@
 <script setup>
 import { ref } from 'vue'
 
-// ナビゲーション項目の配列を定義
 const navItems = [
   { href: '/', text: 'Home' },
+  { href: '/players', text: 'Players' },
   { href: '/matches', text: 'Matches' },
   { href: '/news', text: 'News' },
   { href: '/transfer', text: 'Transfer' },
   { href: '/team', text: 'Team' },
   { href: '/injury', text: 'Injury Report' },
+  { href: '/rating', text: 'Rating' },
+  { href: '/value', text: 'Player Value' },
+  { href: '/mvp', text: 'MVP' },
 ]
 
 const menuOpen = ref(false)
