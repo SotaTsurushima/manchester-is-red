@@ -27,9 +27,9 @@ log-app:
 log-app-watch:
 	docker-compose logs --follow app
 front:
-	docker-compose exec front bash
+	docker-compose exec frontend bash
 back:
-	docker-compose exec back bash
+	docker-compose exec backend bash
 db:
 	docker-compose exec db bash
 attach:
