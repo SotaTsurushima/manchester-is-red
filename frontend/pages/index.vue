@@ -90,6 +90,13 @@ body, html {
   overflow: hidden;
 }
 
+.parallax-bg {
+  transform: translateY(-10%);
+  animation: parallax 10s infinite alternate;
+  will-change: transform;
+  filter: brightness(1.3) contrast(1) saturate(2);
+}
+
 /* フォント追加 */
 @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
 </style>
