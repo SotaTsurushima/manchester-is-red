@@ -31,7 +31,7 @@ import { ref } from 'vue'
 const navItems = [
   { href: '/', text: 'Home' },
   { href: '/players', text: 'Players' },
-  // { href: '/matches', text: 'Matches' },
+  { href: '/matches', text: 'Matches' },
   // { href: '/news', text: 'News' },
   // { href: '/transfer', text: 'Transfer' },
   // { href: '/team', text: 'Team' },
