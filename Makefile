@@ -32,5 +32,5 @@ back:
 	docker-compose exec backend bash
 db:
 	docker-compose exec db bash
-attach:
+at:
 	docker attach backend
