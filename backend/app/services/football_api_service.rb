@@ -3,7 +3,7 @@ class FootballApiService
   base_uri 'https://api.football-data.org/v4/teams/66'
 
   def initialize
-    @headers = { "X-Auth-Token" => "b97dbadb4cbf43d2b11f223017d12731" }
+    @headers = { "X-Auth-Token" => ENV['FOOTBALL_API_TOKEN'] }
   end
 
   def fetch_matches
