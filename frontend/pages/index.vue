@@ -1,5 +1,7 @@
 <template>
-  <div class="relative min-h-screen flex flex-col items-center justify-center text-white overflow-hidden">
+  <div
+    class="relative min-h-screen flex flex-col items-center justify-center text-white overflow-hidden"
+  >
     <!-- 背景画像 (Parallax効果付き) -->
     <div class="absolute inset-0 bg-fixed overflow-hidden">
       <img
@@ -16,14 +18,10 @@
       <h1 class="text-6xl font-extrabold mb-6 drop-shadow-lg text-6xl font-[Anton] tracking-wide">
         Manchester United
       </h1>
-      <p class="text-3xl font-semibold mb-6 tracking-wider">
-        Theatre of Dreams
-      </p>
+      <p class="text-3xl font-semibold mb-6 tracking-wider">Theatre of Dreams</p>
 
       <!-- テキストアニメーション ("Glory Glory Man United") -->
-      <div class="text-5xl font-bold mt-6 glory-text tracking-wide">
-        Glory Glory Man United
-      </div>
+      <div class="text-5xl font-bold mt-6 glory-text tracking-wide">Glory Glory Man United</div>
     </div>
   </div>
 </template>
@@ -31,8 +29,12 @@
 <style scoped>
 /* フェードインアニメーション */
 @keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .animate-fadeIn {
@@ -77,7 +79,8 @@
 }
 
 /* 余白の問題を防ぐ */
-body, html {
+body,
+html {
   height: 100%;
   margin: 0;
 }

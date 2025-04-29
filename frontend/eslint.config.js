@@ -13,8 +13,8 @@ export default [
       },
     },
     rules: {
-      'semi': ['error', 'always'],  // セミコロンを必須に
-      'quotes': ['error', 'single'],  // シングルクォートを必須に
+      semi: ['error', 'always'], // セミコロンを必須に
+      quotes: ['error', 'single'], // シングルクォートを必須に
     },
   },
 ];

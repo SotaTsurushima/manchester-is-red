@@ -3,8 +3,14 @@
     <h1 class="text-3xl font-bold mb-6 text-center text-white">Manchester United Matches</h1>
     <div v-if="loading" class="text-center text-xl text-white">Loading...</div>
     <div v-else>
-      <div v-if="matches.length === 0" class="text-center text-xl text-gray-400">No matches found.</div>
-      <div v-for="match in matches" :key="match.id" class="text-center match-item p-5 mb-4 border rounded-lg bg-gray-800 text-white shadow-lg hover:shadow-2xl">
+      <div v-if="matches.length === 0" class="text-center text-xl text-gray-400">
+        No matches found.
+      </div>
+      <div
+        v-for="match in matches"
+        :key="match.id"
+        class="text-center match-item p-5 mb-4 border rounded-lg bg-gray-800 text-white shadow-lg hover:shadow-2xl"
+      >
         <!-- 試合日時と主審 -->
         <div class="text-center text-sm text-gray-400 mb-2 text-left">
           <div>Date: {{ new Date(match.utcDate).toLocaleString() }}</div>
@@ -15,19 +21,32 @@
         <div class="flex justify-between items-center">
           <!-- 左側: ホームチームエンブレムと名前 -->
           <div class="flex items-center">
-            <img v-if="match.homeTeam.crest" :src="match.homeTeam.crest" alt="Home Team Crest" class="w-8 h-8 mr-2" />
+            <img
+              v-if="match.homeTeam.crest"
+              :src="match.homeTeam.crest"
+              alt="Home Team Crest"
+              class="w-8 h-8 mr-2"
+            />
             <span class="text-xl font-semibold">{{ match.homeTeam.name }}</span>
           </div>
 
           <!-- 右側: アウェイチームエンブレムと名前 -->
           <div class="flex items-center">
             <span class="text-xl font-semibold">{{ match.awayTeam.name }}</span>
-            <img v-if="match.awayTeam.crest" :src="match.awayTeam.crest" alt="Away Team Crest" class="w-8 h-8 ml-2" />
+            <img
+              v-if="match.awayTeam.crest"
+              :src="match.awayTeam.crest"
+              alt="Away Team Crest"
+              class="w-8 h-8 ml-2"
+            />
           </div>
         </div>
 
         <!-- スコア -->
-        <div v-if="match.status === 'FINISHED'" class="text-center text-3xl font-bold text-white mt-2">
+        <div
+          v-if="match.status === 'FINISHED'"
+          class="text-center text-3xl font-bold text-white mt-2"
+        >
           {{ match.score.fullTime.home }} - {{ match.score.fullTime.away }}
         </div>
 
@@ -35,7 +54,9 @@
         <div v-if="match.goals && match.goals.length > 0" class="text-white mt-2">
           <h4 class="text-lg font-semibold">Goals:</h4>
           <ul class="mt-1 space-y-1 text-sm text-gray-300">
-            {{ match.goals }}
+            {{
+              match.goals
+            }}
             <li v-for="(goal, index) in match.goals" :key="index">
               <span v-if="goal.team === 'HOME'" class="text-left block">
                 ⚽ {{ goal.minute }}' {{ goal.scorer }} (Home)
@@ -81,7 +102,7 @@ async function fetchMatches() {
     const response = await fetch('http://localhost:8000/matches');
     const data = await response.json();
     matches.value = data.matches;
-    console.log("🚀 ~ fetchMatches ~ matches.value:", matches.value)
+    console.log('🚀 ~ fetchMatches ~ matches.value:', matches.value);
     loading.value = false;
   } catch (error) {
     console.error('Error fetching matches:', error);
@@ -103,7 +124,9 @@ body {
   background-color: #333;
   border-color: #444;
 }
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   color: #ffffff;
 }
 </style>
