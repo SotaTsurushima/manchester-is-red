@@ -1,7 +1,4 @@
 class FootballApiService
-  
-  binding.pry
-  
   include HTTParty
   base_uri 'https://api.football-data.org/v4/teams/66'
 
