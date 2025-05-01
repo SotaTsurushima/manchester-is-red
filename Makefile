@@ -1,38 +1,40 @@
 u:
-	docker-compose up
+	docker compose up
 b:
-	docker-compose build
+	docker compose build
 no-cache:
-	docker-compose build --no-cache --force-rm
+	docker compose build --no-cache --force-rm
 remake:
 	@make destroy
 	@make up
 stop:
-	docker-compose stop
+	docker compose stop
 d:
-	docker-compose down --remove-orphans
+	docker compose down --remove-orphans
 restart:
 	@make down
 	@make up
 destroy:
-	docker-compose down --rmi all --volumes --remove-orphans
+	docker compose down --rmi all --volumes --remove-orphans
 destroy-volumes:
-	docker-compose down --volumes --remove-orphans
+	docker compose down --volumes --remove-orphans
 ps:
-	docker-compose ps
+	docker compose ps
 logs:
-	docker-compose logs
+	docker compose logs
 log-app:
-	docker-compose logs app
+	docker compose logs app
 log-app-watch:
-	docker-compose logs --follow app
+	docker compose logs --follow app
 front:
-	docker-compose exec frontend bash
+	docker compose exec frontend bash
 back:
-	docker-compose exec backend bash
+	docker compose exec backend bash
 db:
-	docker-compose exec db bash
+	docker compose exec db bash
 at:
 	docker attach backend
 bundle:
-	docker-compose run --rm backend bundle install
+	docker compose run backend bundle install
+rubocop:
+	docker compose run backend bundle exec rubocop -a
