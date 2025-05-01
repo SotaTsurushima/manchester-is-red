@@ -6,7 +6,7 @@ class MatchesController < ApplicationController
     if response.success?
       render json: response.parsed_response
     else
-      render json: { error: 'Failed to fetch matches' }, status: :unprocessable_entity
+      render json: { error: "Failed to fetch matches" }, status: :unprocessable_entity
     end
   end
 end
