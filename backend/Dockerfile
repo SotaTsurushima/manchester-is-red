@@ -9,7 +9,7 @@ RUN apt-get update -qq && \
     libyaml-dev && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /rails
+WORKDIR /app
 
 # 環境設定
 ENV RAILS_ENV="development"
