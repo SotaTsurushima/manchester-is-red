@@ -38,4 +38,6 @@ bundle:
 	docker compose run backend bundle install
 rubocop:
 	docker compose exec backend bundle exec rubocop -A
+cleanup:
+	docker compose down -v
 
