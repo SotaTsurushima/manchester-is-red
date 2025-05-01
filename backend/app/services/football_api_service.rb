@@ -3,88 +3,80 @@ class FootballApiService
   include HTTParty
   base_uri 'https://api.football-data.org/v4'
 
-  def initialize
-    api_key = ENV['FOOTBALL_API_KEY']
-    if api_key.nil? || api_key.empty?
-      Rails.logger.error "FOOTBALL_API_KEY is not set!"
-      raise "API key is not configured"
-    end
+  TEAM_ID = 66  # Manchester United
+  COMPETITION_CODES = {
+    'PL' => 'PL',    # Premier League
+    'CL' => 'CL'     # Champions League
+  }.freeze
 
+  def initialize
     @headers = { 
-      'X-Auth-Token' => api_key,
+      'X-Auth-Token' => fetch_api_key,
       'Accept' => 'application/json'
     }
   end
 
   def get_matches(competition_id = nil)
-    competition_codes = {
-      'PL' => 'PL',    # Premier League
-      'CL' => 'CL',    # Champions League
-      'FA' => 'FAC',   # FA Cup - ここを'FAC'に修正
-      'EFL' => 'EFL'   # League Cup
-    }
+    competitions = competition_id ? COMPETITION_CODES[competition_id] : COMPETITION_CODES.values.join(',')
+    return { 'matches' => [] } unless competitions
 
-    team_id = 66  # Manchester United
-
-    begin
-      if competition_id && competition_codes[competition_id]
-        # FA Cupの場合は特別な処理
-        if competition_id == 'FA'
-          # まず大会の全試合を取得
-          url = "/competitions/#{competition_codes[competition_id]}/matches"
-          response = self.class.get(
-            url,
-            headers: @headers,
-            query: {
-              season: current_season,
-              status: ['SCHEDULED', 'LIVE', 'IN_PLAY', 'PAUSED', 'FINISHED'].join(',')
-            }
-          )
-
-          # レスポンスからManchester Unitedの試合のみをフィルタリング
-          matches_data = response.parsed_response
-          if matches_data['matches']
-            matches_data['matches'].select! do |match|
-              match['homeTeam']['id'] == team_id || match['awayTeam']['id'] == team_id
-            end
-          end
-          return matches_data
-        else
-          # 他の大会は従来通りの処理
-          url = "/teams/#{team_id}/matches"
-          response = self.class.get(
-            url,
-            headers: @headers,
-            query: {
-              competitions: competition_codes[competition_id],
-              status: ['SCHEDULED', 'LIVE', 'IN_PLAY', 'PAUSED', 'FINISHED'].join(','),
-              limit: 100,
-              season: current_season
-            }
-          )
-        end
-      else
-        # 全ての試合を取得
-        url = "/teams/#{team_id}/matches"
-        response = self.class.get(
-          url,
-          headers: @headers,
-          query: {
-            status: ['SCHEDULED', 'LIVE', 'IN_PLAY', 'PAUSED', 'FINISHED'].join(','),
-            limit: 100
-          }
-        )
-      end
-
-      Rails.logger.info "API Response Code: #{response.code}"
-      handle_response(response)
-    rescue => e
-      Rails.logger.error "API Request Error: #{e.message}"
-      raise e
-    end
+    fetch_matches(competitions)
   end
 
   private
+
+  def fetch_api_key
+    ENV['FOOTBALL_API_KEY'].tap do |key|
+      raise "API key is not configured" if key.nil? || key.empty?
+    end
+  end
+
+  def fetch_matches(competitions)
+    response = self.class.get(
+      "/teams/#{TEAM_ID}/matches",
+      headers: @headers,
+      query: build_query(competitions)
+    )
+
+    data = handle_response(response)
+    add_scorers_to_matches(data['matches']) if data['matches']
+    data
+  end
+
+  def build_query(competitions)
+    {
+      competitions: competitions,
+      status: ['SCHEDULED', 'LIVE', 'IN_PLAY', 'PAUSED', 'FINISHED'].join(','),
+      limit: 100,
+      season: current_season
+    }
+  end
+
+  def add_scorers_to_matches(matches)
+    matches.each do |match|
+      next unless match['status'] == 'FINISHED'
+      match['goals'] = get_match_scorers(match['id'])
+    end
+  end
+
+  def get_match_scorers(match_id)
+    response = self.class.get("/matches/#{match_id}", headers: @headers)
+    return nil unless response.success?
+
+    parse_goals(response.parsed_response['goals'])
+  end
+
+  def parse_goals(goals_data)
+    return [] unless goals_data
+
+    goals_data.map do |goal|
+      {
+        minute: goal['minute'],
+        scorer: goal['scorer']['name'],
+        team: goal['team']['id'] == TEAM_ID ? 'HOME' : 'AWAY'
+      }
+    end
+  end
 
   def current_season
     current_month = Time.current.month
@@ -94,14 +86,9 @@ class FootballApiService
 
   def handle_response(response)
     case response.code
-    when 200
-      response.parsed_response
-    when 429
-      Rails.logger.error "API rate limit exceeded"
-      raise "API rate limit exceeded"
-    else
-      Rails.logger.error "API error: #{response.code} - #{response.message}"
-      raise "API error: #{response.code} - #{response.message}"
+    when 200 then response.parsed_response
+    when 429 then raise "API rate limit exceeded"
+    else raise "API error: #{response.code} - #{response.message}"
     end
   end
 end
