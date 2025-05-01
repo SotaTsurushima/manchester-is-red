@@ -1,5 +1,7 @@
 u:
 	docker compose up
+us:
+	docker compose up backend frontend
 b:
 	docker compose build
 no-cache:
@@ -41,3 +43,7 @@ rubocop:
 cleanup:
 	docker compose down -v
 
+# バックエンドのみリスタート
+backend-restart:
+	docker compose stop backend
+	docker compose up -d backend
