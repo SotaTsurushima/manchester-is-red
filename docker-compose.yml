@@ -4,11 +4,8 @@ services:
   db:
     image: mysql:8.0
     container_name: db
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: app_development
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+    env_file:
+      - .env
     ports:
       - "3306:3306"
     volumes:
@@ -21,19 +18,17 @@ services:
       - bundle_cache:/usr/local/bundle
     container_name: backend
     env_file:
-      - backend/.env
+      - .env
     ports:
       - "8000:8000"
     command: bundle exec rails server -b 0.0.0.0 -p 8000
     stdin_open: true
     tty: true
     environment:
-      DATABASE_HOST: db
-      DATABASE_USERNAME: root
-      DATABASE_PASSWORD: password
+      RAILS_ENV: development
     depends_on:
       - db
-      - minio # MinIOサービスを依存関係として追加
+      - minio
 
   frontend:
     build: ./frontend
@@ -49,19 +44,17 @@ services:
   minio:
     image: minio/minio:latest
     container_name: minio
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: miniopassword
-      MINIO_SERVER_ADDRESS: http://localhost:9000
+    env_file:
+      - .env
     ports:
-      - "9000:9000" # MinIOのポート
-      - "9090:9090" # MinIOのポート
+      - "9000:9000"
+      - "9090:9090"
     command:
       ["server", "/data", "--address", ":9000", "--console-address", ":9090"]
     volumes:
-      - minio-data:/data # MinIOのデータを保存するボリューム
+      - minio-data:/data
 
 volumes:
   db-data:
   bundle_cache:
-  minio-data: # MinIO用のデータボリューム
+  minio-data:
