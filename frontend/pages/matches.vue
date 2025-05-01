@@ -45,12 +45,6 @@
         :key="match.id"
         class="text-center match-item p-5 mb-4 rounded-lg bg-gray-800 text-white shadow-lg hover:shadow-2xl transition-all duration-200"
       >
-        <!-- 大会名表示 -->
-        <div class="text-sm text-red-500 mb-2">
-          {{ getCompetitionName(selectedCompetition) }}
-          <span v-if="match.stage" class="ml-2">- {{ match.stage }}</span>
-        </div>
-
         <!-- 試合日時と主審 -->
         <div class="text-center text-sm text-gray-400 mb-2 text-left">
           <div>Date: {{ formatDate(match.utcDate) }}</div>
@@ -119,29 +113,32 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { api } from '../composables/api'
 
+const api = api()
 const matches = ref([])
 const loading = ref(true)
+const error = ref(null)
 const selectedCompetition = ref('PL')
 
 const competitions = [
   { id: 'PL', name: 'Premier League' },
-  { id: 'CL', name: 'Champions League' },
-  { id: 'FA', name: 'FA Cup' },
-  { id: 'EFL', name: 'League Cup' }
+  { id: 'CL', name: 'Champions League' }
+  // { id: 'FA', name: 'FA Cup' },
+  // { id: 'EFL', name: 'League Cup' }
 ]
 
 const sortedMatches = computed(() => {
   const now = new Date()
-  
+
   return [...matches.value].sort((a, b) => {
     const dateA = new Date(a.utcDate)
     const dateB = new Date(b.utcDate)
-    
+
     // 未来の試合（これから行われる試合）
     const aIsFuture = dateA > now
     const bIsFuture = dateB > now
-    
+
     // 両方とも未来の試合の場合は、より近い日付が先頭に
     if (aIsFuture && bIsFuture) {
       return dateA - dateB
@@ -191,15 +188,13 @@ function awayGoals(match) {
   return match.goals?.filter(goal => goal.team === 'AWAY') || []
 }
 
-async function fetchMatches(competitionId) {
-  loading.value = true
+const fetchMatches = async () => {
   try {
-    const response = await fetch(`http://localhost:8000/matches?competition=${competitionId}`)
-    const data = await response.json()
-    console.log("🚀 ~ fetchMatches ~ data:", data)
-    matches.value = data.matches || []
-  } catch (error) {
-    matches.value = []
+    const data = await api.get('/matches')
+    matches.value = data.matches
+  } catch (err) {
+    error.value = 'Failed to load matches'
+    console.error('Error fetching matches:', err)
   } finally {
     loading.value = false
   }
@@ -207,11 +202,11 @@ async function fetchMatches(competitionId) {
 
 function selectCompetition(competitionId) {
   selectedCompetition.value = competitionId
-  fetchMatches(competitionId)
+  fetchMatches()
 }
 
 onMounted(() => {
-  fetchMatches(selectedCompetition.value)
+  fetchMatches()
 })
 </script>
 
