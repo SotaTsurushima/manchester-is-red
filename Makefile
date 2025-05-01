@@ -34,3 +34,5 @@ db:
 	docker-compose exec db bash
 at:
 	docker attach backend
+bundle:
+	docker-compose run --rm backend bundle install
