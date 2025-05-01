@@ -18,7 +18,7 @@
           'list-none flex gap-1',
           menuOpen
             ? 'flex flex-col absolute top-20 left-0 w-full bg-red-700 p-5'
-            : 'hidden md:flex justify-start w-full',
+            : 'hidden md:flex justify-start w-full'
         ]"
       >
         <li v-for="item in navItems" :key="item.text">
@@ -35,24 +35,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from 'vue'
 
 const navItems = [
   { href: '/', text: 'Home' },
   { href: '/players', text: 'Players' },
   { href: '/matches', text: 'Matches' },
-  // { href: '/news', text: 'News' },
-  // { href: '/transfer', text: 'Transfer' },
+  { href: '/transfers', text: 'Transfer' }
   // { href: '/team', text: 'Team' },
   // { href: '/injury', text: 'Injury Report' },
   // { href: '/rating', text: 'Rating' },
   // { href: '/value', text: 'Player Value' },
+  // { href: '/news', text: 'News' },
   // { href: '/mvp', text: 'MVP' },
-];
+]
 
-const menuOpen = ref(false);
+const menuOpen = ref(false)
 
 const toggleMenu = () => {
-  menuOpen.value = !menuOpen.value;
-};
+  menuOpen.value = !menuOpen.value
+}
 </script>
