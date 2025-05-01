@@ -4,7 +4,6 @@
   "singleQuote": true,
   "trailingComma": "none",
   "semi": false,
-  "vueIndentScriptAndStyle": true,
   "singleAttributePerLine": false,
   "htmlWhitespaceSensitivity": "ignore",
   "bracketSameLine": false,
