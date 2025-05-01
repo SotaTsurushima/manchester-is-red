@@ -43,3 +43,38 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# テスト関連
+/test/
+/spec/
+/coverage/
+
+# ドキュメント
+*.md
+/doc/
+/docs/
+
+# 開発用ファイル
+.rspec
+.rubocop.yml
+.ruby-version
+.byebug_history
+
+# エディタ/IDE設定
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# キャッシュ
+/public/assets
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+.sass-cache/
+
+# その他の一時ファイル
+*.log
+*.sqlite3
+*.sqlite3-journal
