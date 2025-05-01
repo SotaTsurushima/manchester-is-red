@@ -37,5 +37,5 @@ at:
 bundle:
 	docker compose run backend bundle install
 rubocop:
-	docker compose exec backend bundle exec rubocop -a
+	docker compose exec backend bundle exec rubocop -A
 

@@ -1,4 +1,4 @@
-plugins:
+require:
   - rubocop-rails
 
 AllCops:
@@ -9,6 +9,9 @@ AllCops:
 
 Layout/LineLength:
   Max: 120
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
 
 Metrics/MethodLength:
   Max: 20
@@ -21,3 +24,7 @@ Layout/IndentationWidth:
 
 Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
+
+Layout/ExtraSpacing:
+  Enabled: true
+  AllowForAlignment: false
