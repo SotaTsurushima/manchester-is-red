@@ -21,6 +21,8 @@ gem "httparty"
 gem "rack-cors"
 gem "thruster", require: false
 
+gem 'nokogiri'
+
 group :development do
   gem "pry"
   gem "pry-rails"

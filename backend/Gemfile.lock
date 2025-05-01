@@ -312,6 +312,7 @@ DEPENDENCIES
   httparty
   kamal
   mysql2 (~> 0.5.2)
+  nokogiri
   pry
   pry-rails
   puma (>= 5.0)
