@@ -1,26 +1,29 @@
 class MatchesController < ApplicationController
   def index
-    competition_id = params[:competition]
-    service = FootballApiService.new
-    
-    begin
-      matches_data = service.get_matches(competition_id)
-      render json: {
-        matches: matches_data['matches'],
-        competition: competition_id
-      }
-    rescue => e
-      Rails.logger.error "Error fetching matches: #{e.message}"
-    end
+    matches_data = fetch_matches
+    render json: format_response(matches_data)
+  rescue StandardError => e
+    handle_error(e)
   end
 
   private
 
-  def render_response(response)
-    if response.success?
-      render json: response.parsed_response
-    else
-      render json: { error: "Failed to fetch matches" }, status: :unprocessable_entity
-    end
+  def fetch_matches
+    FootballApiService.new.get_matches(params[:competition])
+  end
+
+  def format_response(matches_data)
+    {
+      matches: matches_data['matches'],
+      competition: params[:competition]
+    }
+  end
+
+  def handle_error(error)
+    Rails.logger.error "Error fetching matches: #{error.message}"
+    render json: { 
+      error: "Failed to fetch matches",
+      message: error.message 
+    }, status: :unprocessable_entity
   end
 end
