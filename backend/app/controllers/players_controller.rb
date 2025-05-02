@@ -1,4 +1,4 @@
-class ManchesterUnitedController < ApplicationController
+class PlayersController < ApplicationController
   # include HTTParty
 
   # def index
