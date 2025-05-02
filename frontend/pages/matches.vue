@@ -113,9 +113,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { api } from '../composables/api'
+import { useApi } from '../composables/api'
 
-const api = api()
+const api = useApi()
 const matches = ref([])
 const loading = ref(true)
 const error = ref(null)
@@ -126,6 +126,7 @@ const competitions = [
   { id: 'CL', name: 'Champions League' }
   // { id: 'FA', name: 'FA Cup' },
   // { id: 'EFL', name: 'League Cup' }
+  // { id: 'UEL', name: 'Europe League' }
 ]
 
 const sortedMatches = computed(() => {
