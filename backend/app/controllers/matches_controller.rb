@@ -1,9 +1,9 @@
 class MatchesController < ApplicationController
+  include ErrorHandler
+
   def index
     matches_data = fetch_matches
-    render json: format_response(matches_data)
-  rescue StandardError => e
-    handle_error(e)
+    render_success(format_response(matches_data))
   end
 
   private
@@ -17,13 +17,5 @@ class MatchesController < ApplicationController
       matches: matches_data['matches'],
       competition: params[:competition]
     }
-  end
-
-  def handle_error(error)
-    Rails.logger.error "Error fetching matches: #{error.message}"
-    render json: { 
-      error: "Failed to fetch matches",
-      message: error.message 
-    }, status: :unprocessable_entity
   end
 end

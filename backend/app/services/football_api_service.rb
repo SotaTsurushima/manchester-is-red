@@ -1,6 +1,8 @@
 # app/services/football_api_service.rb
 class FootballApiService
   include HTTParty
+  include ServiceHandler
+  
   base_uri 'https://api.football-data.org/v4'
 
   TEAM_ID = 66  # Manchester United
@@ -17,10 +19,12 @@ class FootballApiService
   end
 
   def get_matches(competition_id = nil)
-    competitions = competition_id ? COMPETITION_CODES[competition_id] : COMPETITION_CODES.values.join(',')
-    return { 'matches' => [] } unless competitions
+    handle_response do
+      competitions = competition_id ? COMPETITION_CODES[competition_id] : COMPETITION_CODES.values.join(',')
+      return { 'matches' => [] } unless competitions
 
-    fetch_matches(competitions)
+      fetch_matches(competitions)
+    end
   end
 
   private
@@ -37,8 +41,11 @@ class FootballApiService
       headers: @headers,
       query: build_query(competitions)
     )
+    
+    raise "API error: #{response.code} - #{response.message}" unless response.success?
+    raise "API rate limit exceeded" if response.code == 429
 
-    data = handle_response(response)
+    data = response.parsed_response
     add_scorers_to_matches(data['matches']) if data['matches']
     data
   end
@@ -82,13 +89,5 @@ class FootballApiService
     current_month = Time.current.month
     current_year = Time.current.year
     current_month >= 7 ? current_year : current_year - 1
-  end
-
-  def handle_response(response)
-    case response.code
-    when 200 then response.parsed_response
-    when 429 then raise "API rate limit exceeded"
-    else raise "API error: #{response.code} - #{response.message}"
-    end
   end
 end
