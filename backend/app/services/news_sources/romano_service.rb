@@ -17,8 +17,15 @@ module NewsSources
 
     def parse_news_items(doc)
       doc.css('.article-item').map do |item|
+        
+        binding.pry
+        
         title = item.css('.article-title').text.strip
         image = item.css('.article-image img').first&.[]('src')
+
+        
+        binding.pry
+        
         
         if title.present? && is_united_news?(title)
           {

@@ -7,7 +7,7 @@ class TransferService
 
   def initialize
     @sky_sports = NewsSources::SkySportsService.new
-    @romano = NewsSources::RomanoService.new
+    @romano ||= NewsSources::RomanoTwitterService.new
   end
 
   def get_all_transfer_news
@@ -17,15 +17,15 @@ class TransferService
         romano: @romano.get_transfer_news
       }
 
-      # 必要に応じて、全ニュースを日付順にソートして返すことも可能
-      # combine_and_sort_news(news)
       news
     end
   end
 
-  # 後方互換性のために残す
-  def get_manchester_united_news
-    get_transfer_news
+  def fetch_all_news
+    {
+      sky_sports: sky_sports_service.fetch_news,
+      romano: romano_twitter_service.fetch_news
+    }
   end
 
   private
@@ -35,11 +35,6 @@ class TransferService
   rescue => e
     Rails.logger.error "Failed to fetch transfer news: #{e.message}"
     { sky_sports: [], romano: [] }
-  end
-
-  def combine_and_sort_news(news)
-    all_news = news[:sky_sports] + news[:romano]
-    all_news.sort_by { |item| item[:date] }.reverse
   end
 
   def parse_news_items(doc)
