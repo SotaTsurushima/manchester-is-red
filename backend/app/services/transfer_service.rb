@@ -17,14 +17,20 @@ class TransferService
 
   def parse_news_items(doc)
     doc.css('.sdc-site-tiles__item, article').map do |item|
-      {
-        title: item.css('h3, .sdc-site-tile__headline').text.strip,
-        url: build_url(item.css('a').first&.[]('href')),
-        image: item.css('img').first&.[]('data-src') || item.css('img').first&.[]('src'),
-        date: item.css('time, .sdc-site-tile__date').text.strip.presence || Time.current.strftime('%d %B %Y'),
-        description: item.css('p, .sdc-site-tile__sub-headline').text.strip
-      }
-    end.compact
+      title = item.css('h3, .sdc-site-tile__headline').text.strip
+      image = item.css('img').first&.[]('data-src') || item.css('img').first&.[]('src')
+      
+      # titleとimageが両方存在する場合のみハッシュを返す
+      if title.present? && image.present?
+        {
+          title: title,
+          url: build_url(item.css('a').first&.[]('href')),
+          image: image,
+          date: item.css('time, .sdc-site-tile__date').text.strip.presence || Time.current.strftime('%d %B %Y'),
+          description: item.css('p, .sdc-site-tile__sub-headline').text.strip
+        }
+      end
+    end.compact  # nilの要素を除去
   end
 
   def build_url(path)
