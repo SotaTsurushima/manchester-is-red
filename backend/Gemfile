@@ -22,6 +22,7 @@ gem "rack-cors"
 gem "thruster", require: false
 
 gem 'nokogiri'
+gem 'twitter'
 
 group :development do
   gem "pry"
