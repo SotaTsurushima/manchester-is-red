@@ -2,30 +2,20 @@ class TransferService
   include HTTParty
   include ServiceHandler
 
-  SKY_SPORTS_URL = 'https://www.skysports.com'
-  ROMANO_URL = 'https://romano.com'  # Romanoの公式サイトURL
-
   def initialize
     @sky_sports = NewsSources::SkySportsService.new
-    @romano ||= NewsSources::RomanoTwitterService.new
+    @bbc = NewsSources::BbcService.new
   end
 
   def get_all_transfer_news
     handle_response do
       news = {
         sky_sports: @sky_sports.get_transfer_news,
-        romano: @romano.get_transfer_news
+        bbc: @bbc.get_transfer_news
       }
 
       news
     end
-  end
-
-  def fetch_all_news
-    {
-      sky_sports: sky_sports_service.fetch_news,
-      romano: romano_twitter_service.fetch_news
-    }
   end
 
   private
@@ -34,7 +24,7 @@ class TransferService
     yield
   rescue => e
     Rails.logger.error "Failed to fetch transfer news: #{e.message}"
-    { sky_sports: [], romano: [] }
+    { sky_sports: [], bbc: [] }
   end
 
   def parse_news_items(doc)
