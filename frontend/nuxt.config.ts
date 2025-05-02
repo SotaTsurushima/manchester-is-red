@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      baseUrl: process.env.API_BASE_URL || 'http://localhost:8000'
+      baseUrl: 'http://localhost:8000'  // APIのベースURLを設定
     }
   },
   modules: [

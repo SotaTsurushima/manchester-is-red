@@ -1,5 +1,6 @@
 export const useApi = () => {
-  const baseUrl = useRuntimeConfig().public.baseUrl
+  const config = useRuntimeConfig()
+  const baseUrl = config.public.baseUrl
 
   const get = async (endpoint: string) => {
     const response = await fetch(`${baseUrl}${endpoint}`)
