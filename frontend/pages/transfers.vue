@@ -1,96 +1,112 @@
 <template>
   <div class="bg-gradient-to-b from-red-900 to-black min-h-screen py-12 px-4">
     <div class="max-w-7xl mx-auto">
-      <!-- ヘッダー -->
-      <h1 class="text-4xl font-bold text-white mb-8 text-center">Manchester United News</h1>
+      <h1 class="text-4xl font-bold text-white mb-8 text-center">
+        Manchester United Transfer News
+        <span class="block text-lg mt-2 text-gray-300">Latest Updates</span>
+      </h1>
 
-      <!-- ニュース一覧 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- ローディング表示 -->
+      <div v-if="loading" class="flex flex-col items-center justify-center py-12">
         <div
-          v-for="item in transfers.data"
-          :key="item.url"
-          class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-        >
-          <!-- 画像セクション -->
-          <div class="relative h-48 overflow-hidden">
-            <img
-              v-if="item.image"
-              :src="item.image"
-              :alt="item.title"
-              class="w-full h-full object-cover opacity-100 transition-opacity duration-300"
-            />
-            <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
-              <span class="text-gray-400">No image available</span>
-            </div>
+          class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"
+        ></div>
+        <p class="text-white mt-4 text-lg">Loading transfer news...</p>
+      </div>
 
-            <!-- 日付表示 -->
-            <div
-              v-if="item.date"
-              class="absolute bottom-0 left-0 bg-red-600 text-white px-3 py-1 text-sm"
-            >
-              {{ item.date }}
-            </div>
+      <!-- エラー表示 -->
+      <div v-else-if="error" class="bg-red-50 border-l-4 border-red-500 p-4 mx-4 rounded-md">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <!-- エラーアイコン -->
+            <svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
           </div>
-
-          <!-- ニュース内容 -->
-          <div class="p-4">
-            <!-- タイトル -->
-            <template v-if="item.title">
-              <h2 class="text-xl font-bold mb-2 line-clamp-2 overflow-hidden">{{ item.title }}</h2>
-            </template>
-            <template v-else>
-              <h2 class="text-xl font-bold mb-2 text-gray-400">No Title Available</h2>
-            </template>
-
-            <!-- 日付（画像セクションの日付が表示されない場合のバックアップ） -->
-            <div v-if="item.date && !item.image" class="text-sm text-gray-500 mb-2">
-              {{ item.date }}
-            </div>
-
-            <!-- リンク -->
-            <div v-if="item.url" class="flex justify-end mt-4">
-              <a
-                :href="item.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-300"
-              >
-                Read More
-              </a>
-            </div>
+          <div class="ml-3">
+            <p class="text-red-700">Failed to load transfer news. Please try again later.</p>
           </div>
         </div>
       </div>
 
-      <!-- ローディング表示 -->
-      <div v-if="loading" class="text-center py-8">
-        <div
-          class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600"
-        ></div>
-        <p class="text-white mt-2">Loading news...</p>
+      <!-- データが空の場合 -->
+      <div v-else-if="!hasNews" class="text-center py-12">
+        <div class="bg-white/10 rounded-lg p-8 mx-4">
+          <svg
+            class="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2"
+            />
+          </svg>
+          <h3 class="mt-4 text-lg font-medium text-white">No Transfer News</h3>
+          <p class="mt-2 text-gray-300">
+            There are currently no transfer updates available. Check back later for the latest news.
+          </p>
+          <button
+            @click="refreshNews"
+            class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-300"
+          >
+            Refresh News
+          </button>
+        </div>
       </div>
 
-      <!-- エラー表示 -->
-      <div v-if="error" class="text-center py-8 text-red-500">
-        {{ error }}
+      <!-- ニュース一覧 -->
+      <div v-else class="space-y-12">
+        <template v-for="(source, sourceName) in transfers" :key="sourceName">
+          <div v-if="source.data?.length > 0" class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+              <span class="capitalize">{{ formatSourceName(sourceName) }}</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card v-for="item in source.data" :key="item.url" :item="item" type="news" />
+            </div>
+          </div>
+        </template>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useApi } from '../composables/api'
+import Card from '../components/Card.vue'
 
 const api = useApi()
-const transfers = ref([])
+const transfers = ref({
+  sky_sports: { data: [] },
+  romano: { data: [] }
+})
 const loading = ref(true)
 const error = ref(null)
 
-const fetchTransfers = async () => {
+const hasNews = computed(() => {
+  return transfers.value.sky_sports?.data?.length > 0 || transfers.value.romano?.data?.length > 0
+})
+
+const formatSourceName = name => {
+  return name.replace('_', ' ')
+}
+
+const refreshNews = async () => {
+  loading.value = true
+  error.value = null
   try {
     const response = await api.get('/transfers')
-    transfers.value = response.data || []
+    transfers.value = response.data
   } catch (err) {
     error.value = 'Failed to load news'
     console.error('Error fetching news:', err)
@@ -100,15 +116,6 @@ const fetchTransfers = async () => {
 }
 
 onMounted(() => {
-  fetchTransfers()
+  refreshNews()
 })
 </script>
-
-<style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>
