@@ -32,6 +32,7 @@
       </ul>
     </div>
   </nav>
+  <div class="h-[88px]"></div>
 </template>
 
 <script setup>
