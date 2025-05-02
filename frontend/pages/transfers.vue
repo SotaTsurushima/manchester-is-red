@@ -2,19 +2,19 @@
   <div class="bg-gradient-to-b from-red-900 to-black min-h-screen py-12 px-4">
     <div class="max-w-7xl mx-auto">
       <!-- ヘッダー -->
-      <h1 class="text-4xl font-bold text-white mb-8 text-center">Manchester United transferss</h1>
+      <h1 class="text-4xl font-bold text-white mb-8 text-center">Manchester United Transfers</h1>
 
       <!-- ニュース一覧 -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
-          v-for="item in transferss"
+          v-for="item in transfers"
           :key="item.url"
           class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
         >
           <!-- ニュース画像 -->
           <div class="relative h-48 overflow-hidden">
             <img
-              :src="item.image_url || '/images/default-transferss.jpg'"
+              :src="item.image_url || '/images/default-news.jpg'"
               :alt="item.title"
               class="w-full h-full object-cover"
             />
@@ -48,7 +48,7 @@
         <div
           class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600"
         ></div>
-        <p class="text-white mt-2">Loading transferss...</p>
+        <p class="text-white mt-2">Loading transfers...</p>
       </div>
 
       <!-- エラー表示 -->
@@ -61,8 +61,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useApi } from '../composables/api'
 
-const api = api()
+const api = useApi()
 const transfers = ref([])
 const loading = ref(true)
 const error = ref(null)
@@ -70,7 +71,7 @@ const error = ref(null)
 const fetchTransfers = async () => {
   try {
     const data = await api.get('/transfers')
-    transfers.value = data.transfers
+    transfers.value = data.transfers || []
   } catch (err) {
     error.value = 'Failed to load transfers'
     console.error('Error fetching transfers:', err)
