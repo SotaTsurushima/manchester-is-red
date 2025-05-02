@@ -42,9 +42,9 @@ const navItems = [
   { href: '/', text: 'Home' },
   { href: '/players', text: 'Players' },
   { href: '/matches', text: 'Matches' },
-  { href: '/transfers', text: 'Transfer' }
+  { href: '/transfers', text: 'Transfer' },
+  { href: '/injury', text: 'Injury Report' }
   // { href: '/team', text: 'Team' },
-  // { href: '/injury', text: 'Injury Report' },
   // { href: '/rating', text: 'Rating' },
   // { href: '/value', text: 'Player Value' },
   // { href: '/news', text: 'News' },
