@@ -22,7 +22,7 @@ class TransferService
     yield
   rescue => e
     Rails.logger.error "Failed to fetch transfer news: #{e.message}"
-    { sky_sports: [], bbc: [] }
+    { sky_sports: [] }
   end
 
   def parse_news_items(doc)
