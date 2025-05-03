@@ -4,14 +4,12 @@ class TransferService
 
   def initialize
     @sky_sports = NewsSources::SkySportsService.new
-    @bbc = NewsSources::BbcService.new
   end
 
   def get_all_transfer_news
     handle_response do
       news = {
         sky_sports: @sky_sports.get_transfer_news,
-        bbc: @bbc.get_transfer_news
       }
 
       news
