@@ -6,33 +6,9 @@
         <span class="block text-lg mt-2 text-gray-300">Latest Trusted Reports</span>
       </h1>
 
-      <!-- ローディング表示 -->
-      <div v-if="loading" class="flex flex-col items-center justify-center py-12">
-        <div
-          class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"
-        ></div>
-        <p class="text-white mt-4 text-lg">Loading transfer news...</p>
-      </div>
+      <LoadingSpinner v-if="loading" message="Loading transfer news..." />
 
-      <!-- エラー表示 -->
-      <div v-else-if="error" class="bg-red-50 border-l-4 border-red-500 p-4 mx-4 rounded-md">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <!-- エラーアイコン -->
-            <svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-red-700">Failed to load transfer news. Please try again later.</p>
-          </div>
-        </div>
-      </div>
+      <ErrorMessage v-else-if="error" :message="'Failed to load transfer news. Please try again later.'" />
 
       <!-- データが空の場合 -->
       <div v-else-if="!hasNews" class="text-center py-12">
@@ -84,11 +60,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { useApi } from '../composables/api'
 import Card from '../components/Card.vue'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
+import ErrorMessage from '../components/ErrorMessage.vue'
 
 const api = useApi()
 const transfers = ref({
   sky_sports: { data: [] },
-  romano: { data: [] }
 })
 const loading = ref(true)
 const error = ref(null)

@@ -25,16 +25,9 @@
       </button>
     </div>
 
-    <!-- ローディング表示 -->
-    <div v-if="loading" class="text-center">
-      <div
-        class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600"
-      ></div>
-      <p class="text-white mt-2">
-        Loading {{ getCompetitionName(selectedCompetition) }} matches...
-      </p>
-    </div>
-
+    <LoadingSpinner v-if="loading" message="Loading matches..." />
+    <ErrorMessage v-else-if="error" :message="error" />
+    
     <!-- 試合一覧 -->
     <div v-else>
       <div v-if="matches.length === 0" class="text-center text-xl text-gray-400">
@@ -114,6 +107,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useApi } from '../composables/api'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
+import ErrorMessage from '../components/ErrorMessage.vue'
 
 const api = useApi()
 const matches = ref([])
