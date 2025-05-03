@@ -3,15 +3,34 @@
     class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
   >
     <!-- 画像セクション -->
-    <div class="relative h-48 overflow-hidden">
+    <div class="relative w-full h-40 md:h-56 bg-gray-200 overflow-hidden">
       <img
-        v-if="item.image"
+        v-if="type === 'injury' && item.image"
         :src="item.image"
-        :alt="item.title"
-        class="w-full h-full object-cover"
+        :alt="item.player"
+        class="absolute inset-0 w-full h-full object-contain"
         @error="handleImageError"
       />
-      <img v-else src="/images/bruno.jpeg" :alt="item.title" class="w-full h-full object-cover" />
+      <img
+        v-else-if="type === 'injury'"
+        src="/images/bruno.jpeg"
+        :alt="item.player"
+        class="absolute inset-0 w-full h-full object-cover"
+      />
+      <!-- 既存のnews/player用画像表示 -->
+      <img
+        v-else-if="item.image"
+        :src="item.image"
+        :alt="item.title"
+        class="absolute inset-0 w-full h-full object-cover"
+        @error="handleImageError"
+      />
+      <img
+        v-else
+        src="/images/bruno.jpeg"
+        :alt="item.title"
+        class="absolute inset-0 w-full h-full object-cover"
+      />
       <div
         class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white px-3 py-1 text-sm flex justify-between items-center"
       >
@@ -35,29 +54,39 @@
 
     <!-- ニュース内容 -->
     <div class="p-4">
-      <h2 class="text-xl font-bold mb-2 line-clamp-2">{{ item.title }}</h2>
-      <p v-if="item.description" class="text-gray-600 mb-4 line-clamp-2">
-        {{ item.description }}
-      </p>
-      <div class="flex justify-end mt-4">
-        <!-- ニュース用 -->
-        <a
-          v-if="type === 'news' && item.url !== '#'"
-          :href="item.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-300"
-        >
-          Read More
-        </a>
-        <!-- 選手用 -->
-        <button
-          v-else-if="type === 'player'"
-          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-300"
-        >
-          View Profile
-        </button>
-      </div>
+      <!-- injury用 -->
+      <template v-if="type === 'injury'">
+        <h2 class="text-xl font-bold mb-2 line-clamp-2">{{ item.player }}</h2>
+        <p v-if="item.fee" class="text-gray-600 mb-2">金額: {{ item.fee }}</p>
+        <p v-if="item.return_date" class="text-gray-600 mb-2">復帰予定: {{ item.return_date }}</p>
+        <p v-if="item.injury" class="text-gray-600 mb-2">怪我: {{ item.injury }}</p>
+      </template>
+      <!-- ニュース内容・選手用 -->
+      <template v-else>
+        <h2 class="text-xl font-bold mb-2 line-clamp-2">{{ item.title }}</h2>
+        <p v-if="item.description" class="text-gray-600 mb-4 line-clamp-2">
+          {{ item.description }}
+        </p>
+        <div class="flex justify-end mt-4">
+          <!-- ニュース用 -->
+          <a
+            v-if="type === 'news' && item.url !== '#'"
+            :href="item.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-300"
+          >
+            Read More
+          </a>
+          <!-- 選手用 -->
+          <button
+            v-else-if="type === 'player'"
+            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-300"
+          >
+            View Profile
+          </button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -73,7 +102,7 @@ const props = defineProps({
   type: {
     type: String,
     default: 'player',
-    validator: value => ['news', 'player'].includes(value)
+    validator: value => ['news', 'player', 'injury'].includes(value)
   }
 })
 
