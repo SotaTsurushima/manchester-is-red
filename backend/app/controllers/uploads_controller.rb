@@ -1,16 +1,14 @@
 class UploadsController < ApplicationController
   def create
-    
-    binding.pry
-    
     file = params[:file]
+    name = params[:name]
+    
     unless file
       render json: { error: 'No file uploaded' }, status: :bad_request and return
     end
 
     # MinIOアップロード処理
     require 'aws-sdk-s3'
-    require 'securerandom'
 
     # .envからMinIO情報を取得
     access_key = ENV['MINIO_ACCESS_KEY']
@@ -27,7 +25,7 @@ class UploadsController < ApplicationController
 
     # ファイル名を一意に
     ext = File.extname(file.original_filename)
-    key = "players/#{SecureRandom.uuid}#{ext}"
+    key = "players/#{name}"
 
     obj = s3.bucket(bucket).object(key)
     obj.put(body: file.tempfile, content_type: file.content_type)
