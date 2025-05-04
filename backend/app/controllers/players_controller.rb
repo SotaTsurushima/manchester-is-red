@@ -1,12 +1,17 @@
 class PlayersController < ApplicationController
-  # include HTTParty
+  def create
+    name = params.require(:name)
+    number = params.require(:number)
+    file = params.require(:file)
 
-  # def index
-  #   response = HTTParty.get("https://api.football-data.org/v4/teams/66", headers: {"X-Auth-Token" => "YOUR_API_KEY"})
-  #   if response.success?
-  #     render json: response.parsed_response
-  #   else
-  #     render json: { error: "Could not fetch data" }, status: 500
-  #   end
-  # end
+    url = PlayerUploader.upload(file)
+
+    player = Player.create!(
+      name: name,
+      number: number,
+      image: url
+    )
+
+    render_success({ id: player.id, name: player.name, number: player.number, image: player.image, url: url })
+  end
 end
