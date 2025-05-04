@@ -1,6 +1,4 @@
 class MatchesController < ApplicationController
-  include ErrorHandler
-
   def index
     matches_data = fetch_matches
     render_success(format_response(matches_data))
