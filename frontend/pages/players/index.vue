@@ -1,8 +1,16 @@
 <template>
   <div class="bg-gradient-to-b from-red-900 to-black min-h-screen py-12 px-4">
     <div class="max-w-7xl mx-auto">
-      <Title title="Manchester United Players" subtitle="Squad List" />
-
+      <!-- タイトルを中央寄せし、ボタンを下に配置 -->
+      <div class="flex flex-col items-center mb-8">
+        <Title title="Manchester United Players" subtitle="Squad List" />
+        <NuxtLink
+          to="/players/add"
+          class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          add player
+        </NuxtLink>
+      </div>
       <!-- ポジション別セクション -->
       <div class="space-y-12">
         <template v-for="(players, position) in groupedPlayers" :key="position">
@@ -33,8 +41,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import Card from '../components/Card.vue'
-import Title from '../components/Title.vue'
+import Card from '../../components/Card.vue'
+import Title from '../../components/Title.vue'
 
 // 選手データ
 const players = ref([
