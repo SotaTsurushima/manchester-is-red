@@ -1,14 +1,12 @@
 <template>
   <div class="bg-gradient-to-b from-red-900 to-black min-h-screen py-12 px-4">
     <div class="max-w-7xl mx-auto">
-      <h1 class="text-4xl font-bold text-white mb-8 text-center">
-        Manchester United Transfer News
-        <span class="block text-lg mt-2 text-gray-300">Latest Trusted Reports</span>
-      </h1>
-
+      <Title title="Manchester United Transfer News" subtitle="Latest Trusted Reports" />
       <LoadingSpinner v-if="loading" message="Loading transfer news..." />
-
-      <ErrorMessage v-else-if="error" :message="'Failed to load transfer news. Please try again later.'" />
+      <ErrorMessage
+        v-else-if="error"
+        :message="'Failed to load transfer news. Please try again later.'"
+      />
 
       <!-- データが空の場合 -->
       <div v-else-if="!hasNews" class="text-center py-12">
@@ -62,10 +60,11 @@ import { useApi } from '../composables/api'
 import Card from '../components/Card.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
+import Title from '../components/Title.vue'
 
 const api = useApi()
 const transfers = ref({
-  sky_sports: { data: [] },
+  sky_sports: { data: [] }
 })
 const loading = ref(true)
 const error = ref(null)

@@ -1,9 +1,7 @@
 <template>
   <div class="bg-gradient-to-b from-red-900 to-black min-h-screen py-12 px-4">
     <div class="max-w-7xl mx-auto">
-      <h1 class="text-4xl font-bold text-white mb-8 text-center">
-        First Team Squad
-      </h1>
+      <Title title="Manchester United Players" subtitle="Squad List" />
 
       <!-- ポジション別セクション -->
       <div class="space-y-12">
@@ -36,6 +34,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import Card from '../components/Card.vue'
+import Title from '../components/Title.vue'
 
 // 選手データ
 const players = ref([

@@ -1,6 +1,6 @@
 <template>
   <div class="matches mx-auto p-5 max-w-screen-lg bg-black">
-    <h1 class="text-3xl font-bold mb-6 text-center text-white">Manchester United Matches</h1>
+    <Title title="Manchester United Matches" />
 
     <!-- 大会選択トグル -->
     <div class="flex justify-center space-x-4 mb-6">
@@ -27,7 +27,7 @@
 
     <LoadingSpinner v-if="loading" message="Loading matches..." />
     <ErrorMessage v-else-if="error" :message="error" />
-    
+
     <!-- 試合一覧 -->
     <div v-else>
       <div v-if="matches.length === 0" class="text-center text-xl text-gray-400">
@@ -109,6 +109,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useApi } from '../composables/api'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
+import Title from '../components/Title.vue'
 
 const api = useApi()
 const matches = ref([])

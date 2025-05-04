@@ -1,11 +1,7 @@
 <template>
   <div class="bg-gradient-to-b from-red-900 to-black min-h-screen py-12 px-4">
     <div class="max-w-7xl mx-auto">
-      <h1 class="text-4xl font-bold text-white mb-8 text-center">
-        Manchester United Injury List
-        <span class="block text-lg mt-2 text-gray-300">Latest Injury Updates</span>
-      </h1>
-
+      <Title title="Manchester United Injury List" subtitle="Latest Injury Updates" />
       <LoadingSpinner v-if="loading" message="Loading injuries..." />
       <ErrorMessage v-else-if="error" :message="error" />
 
@@ -53,6 +49,7 @@ import { useMinioUrl } from '../composables/useMinioUrl'
 import Card from '../components/Card.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
+import Title from '../components/Title.vue'
 
 const api = useApi()
 const minioUrl = useMinioUrl()
