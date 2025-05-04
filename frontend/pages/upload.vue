@@ -45,6 +45,7 @@ async function handleUpload() {
   try {
     const formData = new FormData()
     formData.append('file', selectedFile.value)
+    formData.append('name', selectedFile.value.name)
 
     // injury.vueと同じAPI呼び出しスタイル
     const data = await api.post('/upload', formData, true)
