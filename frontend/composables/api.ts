@@ -7,14 +7,15 @@ export const useApi = () => {
     return response.json()
   }
 
-  const post = async (endpoint: string, data: any) => {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
+  const post = async (endpoint: string, data: any, isFormData = false) => {
+    const options: any = {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    })
+      body: isFormData ? data : JSON.stringify(data),
+    }
+    if (!isFormData) {
+      options.headers = { 'Content-Type': 'application/json' }
+    }
+    const response = await fetch(`${baseUrl}${endpoint}`, options)
     return response.json()
   }
 
