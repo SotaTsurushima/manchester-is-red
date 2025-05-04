@@ -7,10 +7,8 @@ class UploadsController < ApplicationController
       render json: { error: 'No file uploaded' }, status: :bad_request and return
     end
 
-    # MinIOアップロード処理
     require 'aws-sdk-s3'
 
-    # .envからMinIO情報を取得
     access_key = ENV['MINIO_ACCESS_KEY']
     secret_key = ENV['MINIO_SECRET_KEY']
     bucket     = 'manchester-united-bucket'
@@ -23,14 +21,12 @@ class UploadsController < ApplicationController
       force_path_style: true
     )
 
-    # ファイル名を一意に
     ext = File.extname(file.original_filename)
     key = "players/#{name}"
 
     obj = s3.bucket(bucket).object(key)
     obj.put(body: file.tempfile, content_type: file.content_type)
 
-    # 公開URLを組み立て
     base_url = 'http://localhost:9000'
     url = "#{base_url}/#{bucket}/#{key}"
 
