@@ -2,10 +2,6 @@ require 'dotenv'
 Dotenv.load('../.env')
 require 'aws-sdk-s3'
 
-puts File.read('../.env')
-puts "MINIO_ACCESS_KEY: #{ENV['MINIO_ACCESS_KEY']}"
-puts "MINIO_SECRET_KEY: #{ENV['MINIO_SECRET_KEY']}"
-
 # MinIOの設定（Docker Composeの場合はサービス名でアクセス）
 s3 = Aws::S3::Resource.new(
   endpoint: 'http://minio:9000', # ←ここを修正
@@ -27,9 +23,3 @@ obj.upload_file(file_path)
 
 # 公開URLを取得
 image_url = obj.public_url
-
-puts "アップロード完了: #{image_url}"
-
-puts "ACCESS_KEY: #{ENV['MINIO_ACCESS_KEY']}"
-puts "SECRET_KEY: #{ENV['MINIO_SECRET_KEY']}"
-
