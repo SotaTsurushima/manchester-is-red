@@ -6,9 +6,8 @@
         <span class="block text-lg mt-2 text-gray-300">Latest Injury Updates</span>
       </h1>
 
-      <LoadingSpinner v-if="loading" message="Loading injury news..." />
-
-      <ErrorMessage v-else-if="error" :message="'Failed to load injuries. Please try again later.'" />
+      <LoadingSpinner v-if="loading" message="Loading injuries..." />
+      <ErrorMessage v-else-if="error" :message="error" />
 
       <!-- データが空の場合 -->
       <div v-else-if="injuries.length === 0" class="text-center py-12">
@@ -41,12 +40,7 @@
 
       <!-- 怪我人カード一覧 -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card
-          v-for="injury in injuries"
-          :key="injury.player"
-          :item="injuryCard(injury)"
-          type="player"
-        />
+        <Card v-for="injury in injuries" :key="injury.player" :item="injury" type="injury" />
       </div>
     </div>
   </div>
@@ -55,11 +49,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useApi } from '../composables/api'
+import { useMinioUrl } from '../composables/useMinioUrl'
 import Card from '../components/Card.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
 
 const api = useApi()
+const minioUrl = useMinioUrl()
 const injuries = ref([])
 const loading = ref(true)
 const error = ref(null)
@@ -69,7 +65,12 @@ const fetchInjuries = async () => {
   error.value = null
   try {
     const data = await api.get('/injuries')
-    injuries.value = data.injuries || data.data || []
+    // feeがない場合は空文字をセット
+    injuries.value = (data.injuries || data.data || []).map(injury => ({
+      ...injury,
+      fee: injury.fee || '',
+      image: injury.image || `${minioUrl}/players/bruno.jpeg`
+    }))
   } catch (err) {
     error.value = 'Failed to load injuries'
     injuries.value = []
@@ -77,14 +78,6 @@ const fetchInjuries = async () => {
     loading.value = false
   }
 }
-
-// Card用にinjuryデータを整形
-const injuryCard = injury => ({
-  title: injury.player,
-  description: `${injury.injury}（復帰予定: ${injury.return_date}）`,
-  image: '', // 画像があればURLをセット
-  reliability: '' // 必要ならセット
-})
 
 onMounted(() => {
   fetchInjuries()
