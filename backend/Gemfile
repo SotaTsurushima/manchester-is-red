@@ -22,13 +22,13 @@ gem "rack-cors"
 gem "thruster", require: false
 
 gem 'nokogiri'
+gem 'aws-sdk-s3'
 
 group :development do
   gem "pry"
   gem "pry-rails"
   gem "rubocop", require: false
   gem "rubocop-rails", require: false
-  gem 'aws-sdk-s3'
 end
 
 group :development, :test do
