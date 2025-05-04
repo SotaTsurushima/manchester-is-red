@@ -12,7 +12,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      baseUrl: 'http://localhost:8000'  // APIのベースURLを設定
+      baseUrl: 'http://localhost:8000',  // APIのベースURLを設定
+      MINIO_BASE_URL: process.env.MINIO_BASE_URL || 'http://localhost:9000/manchester-united-bucket'
     }
   },
   modules: [
