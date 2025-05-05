@@ -5,31 +5,18 @@
     <!-- 画像セクション -->
     <div class="relative w-full h-40 md:h-56 bg-gray-200 overflow-hidden">
       <img
-        v-if="type === 'injury' && item.image"
-        :src="item.image"
-        :alt="item.player"
-        class="absolute inset-0 w-full h-full object-contain"
-        @error="handleImageError"
-      />
-      <img
-        v-else-if="type === 'injury'"
-        src="/images/bruno.jpeg"
-        :alt="item.player"
-        class="absolute inset-0 w-full h-full object-cover"
-      />
-      <!-- 既存のnews/player用画像表示 -->
-      <img
-        v-else-if="item.image"
-        :src="item.image"
-        :alt="item.title"
+        v-if="type === 'injury'"
+        :src="item.image || '/images/bruno.jpeg'"
+        :alt="item.player_name || item.player"
         class="absolute inset-0 w-full h-full object-contain"
         @error="handleImageError"
       />
       <img
         v-else
-        src="/images/bruno.jpeg"
+        :src="item.image || '/images/bruno.jpeg'"
         :alt="item.title"
-        class="absolute inset-0 w-full h-full object-cover"
+        class="absolute inset-0 w-full h-full object-contain"
+        @error="handleImageError"
       />
       <div
         class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white px-3 py-1 text-sm flex justify-between items-center"
@@ -56,10 +43,12 @@
     <div class="p-4">
       <!-- injury用 -->
       <template v-if="type === 'injury'">
-        <h2 class="text-xl font-bold mb-2 line-clamp-2">{{ item.player }}</h2>
-        <p v-if="item.fee" class="text-gray-600 mb-2">金額: {{ item.fee }}</p>
-        <p v-if="item.return_date" class="text-gray-600 mb-2">復帰予定: {{ item.return_date }}</p>
-        <p v-if="item.injury" class="text-gray-600 mb-2">怪我: {{ item.injury }}</p>
+        <h2 class="text-xl font-bold mb-2 line-clamp-2">{{ item.player_name || item.player }}</h2>
+        <p v-if="item.fee" class="text-gray-600 mb-2">Fee: {{ item.fee }}</p>
+        <p v-if="item.return_date" class="text-gray-600 mb-2">
+          Expected Return: {{ item.return_date }}
+        </p>
+        <p v-if="item.injury" class="text-gray-600 mb-2">Injury: {{ item.injury }}</p>
       </template>
       <!-- ニュース内容・選手用 -->
       <template v-else>
