@@ -19,8 +19,21 @@ export const useApi = () => {
     return response.json()
   }
 
+  const put = async (endpoint: string, data: any, isFormData = false) => {
+    const options: any = {
+      method: 'PUT',
+      body: isFormData ? data : JSON.stringify(data),
+    }
+    if (!isFormData) {
+      options.headers = { 'Content-Type': 'application/json' }
+    }
+    const response = await fetch(`${baseUrl}${endpoint}`, options)
+    return response.json()
+  }
+
   return {
     get,
-    post
+    post,
+    put
   }
 }
