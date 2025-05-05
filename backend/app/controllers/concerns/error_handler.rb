@@ -10,7 +10,13 @@ module ErrorHandler
   private
 
   def handle_error(e)
-    render json: { success: false, error: e.message }, status: :internal_server_error
+    Rails.logger.error e.full_message # ログにも詳細を出す
+    render json: {
+      success: false,
+      error: e.message,
+      class: e.class.to_s,
+      full_message: e.full_message(highlight: false, order: :top)
+    }, status: :internal_server_error
   end
 
   def handle_not_found(e)
