@@ -45,17 +45,20 @@
         <div class="mb-4">
           <label class="block mb-1 font-semibold">Photo</label>
           <input type="file" @change="onFileChange" accept="image/*" class="w-full" />
+          <div class="mt-2 text-sm text-gray-600">
+            {{
+              selectedFile
+                ? selectedFile.name
+                : currentImage
+                  ? extractFileName(currentImage)
+                  : 'No file selected'
+            }}
+          </div>
           <div v-if="previewImage" class="mt-2">
             <img :src="previewImage" alt="Preview" class="max-h-48 rounded" />
           </div>
           <div v-else-if="currentImage" class="mt-2">
             <img :src="currentImage" alt="Current" class="max-h-48 rounded" />
-          </div>
-          <div v-if="selectedFile" class="mt-2 text-sm text-gray-600">
-            Selected file: {{ selectedFile.name }}
-          </div>
-          <div v-else-if="currentImage" class="mt-2 text-sm text-gray-600">
-            Current file: {{ extractFileName(currentImage) }}
           </div>
         </div>
         <div class="flex justify-end gap-4 mt-6">
@@ -140,16 +143,11 @@ async function handleUpdate() {
     let isFormData = false
     if (selectedFile.value) {
       formData = new FormData()
-      const fields = {
-        name: playerName.value,
-        number: playerNumber.value,
-        position: playerPosition.value,
-        file: selectedFile.value,
-        filename: selectedFile.value.name
-      }
-      Object.entries(fields).forEach(([key, value]) => {
-        formData.append(key, value)
-      })
+      formData.append('name', playerName.value)
+      formData.append('number', playerNumber.value)
+      formData.append('position', playerPosition.value)
+      formData.append('file', selectedFile.value)
+      formData.append('filename', selectedFile.value.name)
       isFormData = true
     } else {
       formData = {

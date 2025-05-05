@@ -67,6 +67,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useApi } from '../../composables/api'
+import { useRouter } from 'vue-router'
 import Title from '../../components/Title.vue'
 import Background from '../../components/Background.vue'
 
@@ -78,6 +79,7 @@ const imageUrl = ref('')
 const loading = ref(false)
 const error = ref('')
 const success = ref(false)
+const router = useRouter()
 
 const api = useApi()
 
@@ -107,7 +109,7 @@ async function handleRegister() {
       imageUrl.value = data.data.url
       success.value = true
       setTimeout(() => {
-        window.location.reload()
+        router.push('/players')
       }, 1000)
     } else {
       error.value = data.errors ? data.errors.join(', ') : data.error || 'Registration failed'
