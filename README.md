@@ -46,3 +46,12 @@ cp backend/.env.example backend/.env
 ```
 
 3. Add your Football Data API key to `backend/.env`
+
+## Notes
+
+- MinIO/S3 integration and image deletion permissions are described in the README or code comments.
+- For detailed API specs or customization, see the `/docs` directory or code comments.
+
+---
+
+**Questions and contributions are welcome!**
