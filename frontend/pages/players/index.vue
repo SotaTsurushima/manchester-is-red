@@ -11,7 +11,6 @@
           add player
         </NuxtLink>
       </div>
-      <!-- ポジション別セクション -->
       <div class="space-y-12">
         <template v-for="(players, position) in groupedPlayers" :key="position">
           <div v-if="players.length > 0" class="mb-12">
@@ -55,7 +54,6 @@ const groupedPlayers = computed(() => {
     MF: [],
     FW: []
   }
-  // APIのposition値が "GK", "DF", "MF", "FW" であることを前提
   players.value.forEach(player => {
     if (groups[player.position]) {
       groups[player.position].push(player)
@@ -70,7 +68,6 @@ onMounted(async () => {
     if (res.success) {
       players.value = res.data
     } else {
-      // エラー処理（必要なら）
       console.error(res.error || 'Failed to fetch players')
     }
   } catch (e) {
