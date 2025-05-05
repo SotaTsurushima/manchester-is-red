@@ -3,33 +3,39 @@ class PlayersController < ApplicationController
     players = Player.all
     render_success(players.as_json(only: [:id, :name, :number, :position, :image]))
   end
+
+  def show
+    player = Player.find(params[:id])
+    render_success(player.as_json(only: [:id, :name, :number, :position, :image]))
+  end
   
   def create
-    name = params.require(:name)
-    number = params.require(:number)
-    position = params.require(:position)
     file = params.require(:file)
-
     url = Players::PlayerUploader.upload(file)
 
-    player = Player.new(
-      name: name,
-      number: number,
-      position: position,
-      image: url
-    )
+    player = Player.new(player_params.merge(image: url))
+    player.save! # バリデーションエラー時はconcernでハンドリング
 
-    if player.save
-      render_success({
-        id: player.id,
-        name: player.name,
-        number: player.number,
-        position: player.position,
-        image: player.image,
-        url: url
-      })
+    render_success(player.as_json(only: [:id, :name, :number, :position, :image]).merge(url: url))
+  end
+
+  def update
+    player = Player.find(params[:id])
+
+    url = if params[:file].present?
+      Players::PlayerUploader.upload(params[:file])
     else
-      render json: { success: false, errors: player.errors.full_messages }, status: :unprocessable_entity
+      player.image
     end
+
+    player.update!(player_params.merge(image: url)) # バリデーションエラー時はconcernでハンドリング
+
+    render_success(player.as_json(only: [:id, :name, :number, :position, :image]))
+  end
+
+  private
+
+  def player_params
+    params.permit(:name, :number, :position)
   end
 end
