@@ -43,60 +43,38 @@
 import { ref, computed, onMounted } from 'vue'
 import Card from '../../components/Card.vue'
 import Title from '../../components/Title.vue'
+import { useApi } from '../../composables/api'
 
-// 選手データ
-const players = ref([
-  {
-    id: 1,
-    name: 'Andre Onana',
-    number: '24',
-    position: 'Goalkeeper',
-    image: '/images/bruno.jpeg'
-  },
-  {
-    id: 2,
-    name: 'Altay Bayindir',
-    number: '1',
-    position: 'Goalkeeper',
-    image: '/images/bruno.jpeg'
-  },
-  {
-    id: 3,
-    name: 'Raphael Varane',
-    number: '19',
-    position: 'Defender',
-    image: '/images/bruno.jpeg'
-  },
-  {
-    id: 4,
-    name: 'Bruno Fernandes',
-    number: '8',
-    position: 'Midfielder',
-    image: '/images/bruno.jpeg'
-  },
-  {
-    id: 5,
-    name: 'Rasmus Hojlund',
-    number: '11',
-    position: 'Forward',
-    image: '/images/bruno.jpeg'
-  }
-  // 他の選手も同様に追加
-])
+const api = useApi()
+const players = ref([])
 
-// ポジション別にグループ化
 const groupedPlayers = computed(() => {
-  const groups = {}
-  const positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward']
-
-  positions.forEach(position => {
-    groups[position] = players.value.filter(player => player.position === position)
+  const groups = {
+    GK: [],
+    DF: [],
+    MF: [],
+    FW: []
+  }
+  // APIのposition値が "GK", "DF", "MF", "FW" であることを前提
+  players.value.forEach(player => {
+    if (groups[player.position]) {
+      groups[player.position].push(player)
+    }
   })
-
   return groups
 })
 
 onMounted(async () => {
-  // 将来的にAPIからデータを取得する場合はここに実装
+  try {
+    const res = await api.get('/players')
+    if (res.success) {
+      players.value = res.data
+    } else {
+      // エラー処理（必要なら）
+      console.error(res.error || 'Failed to fetch players')
+    }
+  } catch (e) {
+    console.error(e)
+  }
 })
 </script>
