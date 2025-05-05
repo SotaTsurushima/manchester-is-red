@@ -20,13 +20,15 @@
               v-for="player in players"
               :key="player.id"
               :item="{
+                id: player.id,
                 title: player.name,
                 image: player.image,
                 description: position,
                 reliability: player.number,
                 date: '',
-                url: '#'
+                url: `/players/${player.id}/edit`
               }"
+              type="player"
             />
           </div>
         </div>
