@@ -68,12 +68,13 @@
             Read More
           </a>
           <!-- 選手用 -->
-          <button
+          <NuxtLink
             v-else-if="type === 'player'"
+            :to="item.url"
             class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-300"
           >
             View Profile
-          </button>
+          </NuxtLink>
         </div>
       </template>
     </div>
