@@ -45,8 +45,8 @@
         </button>
         <div v-if="loading" class="mt-2 text-blue-600">Registering...</div>
         <div v-if="error" class="mt-2 text-red-600">{{ error }}</div>
-        <div v-if="imageUrl" class="mt-4">
-          <p>Registration Complete!</p>
+        <div v-if="success" class="mt-4">
+          <p class="text-green-600 font-bold">Registration Complete!</p>
           <img :src="imageUrl" alt="Uploaded" class="mt-2 max-h-48 rounded" />
         </div>
       </form>
@@ -65,6 +65,7 @@ const selectedFile = ref(null)
 const imageUrl = ref('')
 const loading = ref(false)
 const error = ref('')
+const success = ref(false)
 
 const api = useApi()
 
@@ -78,6 +79,7 @@ async function handleRegister() {
   loading.value = true
   error.value = ''
   imageUrl.value = ''
+  success.value = false
 
   try {
     const formData = new FormData()
@@ -86,8 +88,13 @@ async function handleRegister() {
     formData.append('file', selectedFile.value)
     formData.append('filename', selectedFile.value.name)
 
-    const data = await api.post('/players', formData, true) // Adjust endpoint as needed
-    imageUrl.value = data.url // Show uploaded image
+    const data = await api.post('/players', formData, true)
+    if (data.success) {
+      imageUrl.value = data.data.url // サーバーのrender_successで返す場合
+      success.value = true
+    } else {
+      error.value = data.errors ? data.errors.join(', ') : data.error || 'Registration failed'
+    }
   } catch (e) {
     error.value = e.message
   } finally {
