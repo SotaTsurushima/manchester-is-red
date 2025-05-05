@@ -31,9 +31,15 @@ export const useApi = () => {
     return response.json()
   }
 
+  const del = async (endpoint: string) => {
+    const response = await fetch(`${baseUrl}${endpoint}`, { method: 'DELETE' })
+    return response.json()
+  }
+
   return {
     get,
     post,
-    put
+    put,
+    delete: del
   }
 }
