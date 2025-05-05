@@ -1,4 +1,9 @@
 class PlayersController < ApplicationController
+  def index
+    players = Player.all
+    render_success(players.as_json(only: [:id, :name, :number, :position, :image]))
+  end
+  
   def create
     name = params.require(:name)
     number = params.require(:number)
