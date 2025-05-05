@@ -33,6 +33,13 @@ class PlayersController < ApplicationController
     render_success(player.as_json(only: [:id, :name, :number, :position, :image]))
   end
 
+  def destroy
+    player = Player.find(params[:id])
+    Players::PlayerUploader.delete(player.image) if player.image.present?
+    player.destroy!
+    render_success({ id: player.id })
+  end
+
   private
 
   def player_params
