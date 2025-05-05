@@ -17,21 +17,12 @@ module Players
     end
 
     def self.upload(file)
-      key = "players/#{file.original_filename}"
+      filename = file.original_filename.gsub(/\s+/, '_')
+      key = "players/#{filename}"
       obj = s3_resource.bucket(BUCKET).object(key)
       obj.put(body: file.tempfile, content_type: file.content_type)
       base_url = ENDPOINT.sub('minio', 'localhost') # 必要に応じて調整
       "#{base_url}/#{BUCKET}/#{key}"
-    end
-
-    def handle_error(e)
-      Rails.logger.error e.full_message # ログにも詳細を出す
-      render json: {
-        success: false,
-        error: e.message,
-        class: e.class.to_s,
-        full_message: e.full_message(highlight: false, order: :top)
-      }, status: :internal_server_error
     end
 
     def self.delete(image_url)
