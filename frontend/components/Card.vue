@@ -22,7 +22,7 @@
         v-else-if="item.image"
         :src="item.image"
         :alt="item.title"
-        class="absolute inset-0 w-full h-full object-cover"
+        class="absolute inset-0 w-full h-full object-contain"
         @error="handleImageError"
       />
       <img
