@@ -104,8 +104,11 @@ async function handleRegister() {
 
     const data = await api.post('/players', formData, true)
     if (data.success) {
-      imageUrl.value = data.data.url // サーバーのrender_successで返す場合
+      imageUrl.value = data.data.url
       success.value = true
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     } else {
       error.value = data.errors ? data.errors.join(', ') : data.error || 'Registration failed'
     }
