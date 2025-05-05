@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gradient-to-b from-red-900 to-black min-h-screen py-12 px-4">
+  <Background>
     <div class="max-w-2xl mx-auto">
       <div class="flex flex-col items-center mb-8">
         <Title title="Add New Player" subtitle="Register a new Manchester United player" />
@@ -34,7 +34,7 @@
         </div>
         <div class="mb-4">
           <label class="block mb-1 font-semibold">Position</label>
-          <select v-model="playerPosition" required>
+          <select v-model="playerPosition" required class="w-full border px-3 py-2 rounded">
             <option value="" disabled>Select Position</option>
             <option value="FW">FW</option>
             <option value="MF">MF</option>
@@ -48,7 +48,7 @@
         </div>
         <button
           type="submit"
-          :disabled="!playerName || !playerNumber || !selectedFile || loading"
+          :disabled="!playerName || !playerNumber || !playerPosition || !selectedFile || loading"
           class="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
         >
           Register
@@ -61,13 +61,14 @@
         </div>
       </form>
     </div>
-  </div>
+  </Background>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useApi } from '../../composables/api'
 import Title from '../../components/Title.vue'
+import Background from '../../components/Background.vue'
 
 const playerName = ref('')
 const playerNumber = ref('')
@@ -86,7 +87,8 @@ function onFileChange(e) {
 }
 
 async function handleRegister() {
-  if (!playerName.value || !playerNumber.value || !selectedFile.value) return
+  if (!playerName.value || !playerNumber.value || !playerPosition.value || !selectedFile.value)
+    return
   loading.value = true
   error.value = ''
   imageUrl.value = ''

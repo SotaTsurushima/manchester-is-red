@@ -1,45 +1,19 @@
 <template>
-  <div class="bg-gradient-to-b from-red-900 to-black min-h-screen py-12 px-4">
-    <div class="max-w-7xl mx-auto">
-      <Title title="Manchester United Injury List" subtitle="Latest Injury Updates" />
-      <LoadingSpinner v-if="loading" message="Loading injuries..." />
-      <ErrorMessage v-else-if="error" :message="error" />
-
-      <!-- データが空の場合 -->
-      <div v-else-if="injuries.length === 0" class="text-center py-12">
-        <div class="bg-white/10 rounded-lg p-8 mx-4">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2"
-            />
-          </svg>
-          <h3 class="mt-4 text-lg font-medium text-white">No Injury Data</h3>
-          <p class="mt-2 text-gray-300">
-            There are currently no injury updates available. Check back later for the latest info.
-          </p>
-          <button
-            @click="fetchInjuries"
-            class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-300"
-          >
-            Refresh
-          </button>
-        </div>
-      </div>
-
-      <!-- 怪我人カード一覧 -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card v-for="injury in injuries" :key="injury.player" :item="injury" type="injury" />
-      </div>
+  <Background>
+    <Title title="Manchester United Injury List" subtitle="Latest Injury Updates" />
+    <LoadingSpinner v-if="loading" message="Loading injuries..." />
+    <ErrorMessage v-else-if="error" :message="error" />
+    <EmptyState
+        v-else-if="injuries.length === 0"
+        title="No Injury Data"
+        message="There are currently no injury updates available. Check back later for the latest info."
+        buttonText="Refresh"
+        :onClick="fetchInjuries"
+      />
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Card v-for="injury in injuries" :key="injury.player" :item="injury" type="injury" />
     </div>
-  </div>
+  </Background>
 </template>
 
 <script setup>
@@ -50,10 +24,13 @@ import Card from '../components/Card.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
 import Title from '../components/Title.vue'
+import EmptyState from '../components/EmptyState.vue'
+import Background from '../../components/Background.vue'
 
 const api = useApi()
 const minioUrl = useMinioUrl()
 const injuries = ref([])
+const players = ref([])
 const loading = ref(true)
 const error = ref(null)
 
@@ -62,10 +39,8 @@ const fetchInjuries = async () => {
   error.value = null
   try {
     const data = await api.get('/injuries')
-    // feeがない場合は空文字をセット
     injuries.value = (data.injuries || data.data || []).map(injury => ({
       ...injury,
-      fee: injury.fee || '',
       image: injury.image || `${minioUrl}/players/bruno.jpeg`
     }))
   } catch (err) {
@@ -76,7 +51,22 @@ const fetchInjuries = async () => {
   }
 }
 
+const fetchPlayers = async () => {
+  try {
+    const res = await api.get('/players')
+    if (res.success) {
+      // players.value = res.data
+      console.log('players:', players.value)
+    } else {
+      console.error(res.error || 'Failed to fetch players')
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 onMounted(() => {
   fetchInjuries()
+  fetchPlayers()
 })
 </script>
