@@ -33,6 +33,16 @@
           />
         </div>
         <div class="mb-4">
+          <label class="block mb-1 font-semibold">Position</label>
+          <select v-model="playerPosition" required>
+            <option value="" disabled>Select Position</option>
+            <option value="FW">FW</option>
+            <option value="MF">MF</option>
+            <option value="DF">DF</option>
+            <option value="GK">GK</option>
+          </select>
+        </div>
+        <div class="mb-4">
           <label class="block mb-1 font-semibold">Photo</label>
           <input type="file" @change="onFileChange" accept="image/*" required class="w-full" />
         </div>
@@ -61,6 +71,7 @@ import Title from '../../components/Title.vue'
 
 const playerName = ref('')
 const playerNumber = ref('')
+const playerPosition = ref('')
 const selectedFile = ref(null)
 const imageUrl = ref('')
 const loading = ref(false)
@@ -85,6 +96,7 @@ async function handleRegister() {
     const formData = new FormData()
     formData.append('name', playerName.value)
     formData.append('number', playerNumber.value)
+    formData.append('position', playerPosition.value)
     formData.append('file', selectedFile.value)
     formData.append('filename', selectedFile.value.name)
 

@@ -2,6 +2,7 @@ class PlayersController < ApplicationController
   def create
     name = params.require(:name)
     number = params.require(:number)
+    position = params.require(:position)
     file = params.require(:file)
 
     url = Players::PlayerUploader.upload(file)
@@ -9,6 +10,7 @@ class PlayersController < ApplicationController
     player = Player.new(
       name: name,
       number: number,
+      position: position,
       image: url
     )
 
@@ -17,6 +19,7 @@ class PlayersController < ApplicationController
         id: player.id,
         name: player.name,
         number: player.number,
+        position: player.position,
         image: player.image,
         url: url
       })
