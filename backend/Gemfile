@@ -23,7 +23,6 @@ gem "thruster", require: false
 
 gem 'nokogiri'
 gem 'aws-sdk-s3'
-gem 'rss'
 
 group :development do
   gem "pry"
