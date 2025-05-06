@@ -11,11 +11,11 @@ A web application to track Manchester United matches, player information, and te
 
 ## Tech Stack
 
-- **Frontend**: Vue.js/Nuxt.js
-- **Backend**: Ruby on Rails
-- **Database**: MySQL
-- **Storage**: MinIO
-- **Container**: Docker
+- **Frontend**: Vue.js/Nuxt.js 3.5.13/3.16.2
+- **Backend**: Ruby on Rails 8.0.2
+- **Database**: MySQL 8.0
+- **Storage**: Minio 
+- **Container**: Docker 3.8
 
 ## Prerequisites
 
