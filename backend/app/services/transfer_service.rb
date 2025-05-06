@@ -4,12 +4,14 @@ class TransferService
 
   def initialize
     @sky_sports = NewsSources::SkySportsService.new
+    @guardian = NewsSources::GuardianService.new
   end
 
   def get_all_transfer_news
     handle_response do
       news = {
         sky_sports: @sky_sports.get_transfer_news,
+        guardian: @guardian.get_transfer_news
       }
 
       news
@@ -17,31 +19,6 @@ class TransferService
   end
 
   private
-
-  def handle_response
-    yield
-  rescue => e
-    Rails.logger.error "Failed to fetch transfer news: #{e.message}"
-    { sky_sports: [] }
-  end
-
-  def parse_news_items(doc)
-    doc.css('.sdc-site-tiles__item, article').map do |item|
-      title = item.css('h3, .sdc-site-tile__headline').text.strip
-      image = item.css('img').first&.[]('data-src') || item.css('img').first&.[]('src')
-      
-      # タイトルと画像が存在し、かつ移籍関連の記事のみを抽出
-      if title.present? && image.present? && is_transfer_news?(title)
-        {
-          title: title,
-          url: build_url(item.css('a').first&.[]('href')),
-          image: image,
-          date: item.css('time, .sdc-site-tile__date').text.strip.presence || Time.current.strftime('%d %B %Y'),
-          description: item.css('p, .sdc-site-tile__sub-headline').text.strip
-        }
-      end
-    end.compact
-  end
 
   def is_transfer_news?(title)
     # 移籍関連のキーワードを含むタイトルのみを抽出
