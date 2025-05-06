@@ -40,14 +40,12 @@ import EmptyState from '../components/EmptyState.vue'
 import Background from '../components/Background.vue'
 
 const api = useApi()
-const transfers = ref({
-  sky_sports: { data: [] }
-})
+const transfers = ref({})
 const loading = ref(true)
 const error = ref(null)
 
 const hasNews = computed(() => {
-  return transfers.value.sky_sports?.data?.length > 0 || transfers.value.romano?.data?.length > 0
+  return Object.values(transfers.value).some(source => source.data?.length > 0)
 })
 
 const formatSourceName = name => {
@@ -59,7 +57,8 @@ const refreshNews = async () => {
   error.value = null
   try {
     const response = await api.get('/transfers')
-    transfers.value = response.data
+    transfers.value = response.data.data
+    console.log(transfers.value)
   } catch (err) {
     error.value = 'Failed to load news'
     console.error('Error fetching news:', err)

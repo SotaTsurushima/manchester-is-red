@@ -11,14 +11,20 @@ class TransferService
     handle_response do
       news = {
         sky_sports: @sky_sports.get_transfer_news,
-        guardian: @guardian.get_transfer_news
+        guardian:   wrap_guardian(@guardian.get_transfer_news)
       }
-
       news
     end
   end
 
   private
+
+  def wrap_guardian(result)
+    # すでに { success: true, data: [...] } ならそのまま返す
+    return result if result.is_a?(Hash) && result.key?(:success) && result.key?(:data)
+    # 配列なら success: true でラップ
+    { success: true, data: result }
+  end
 
   def is_transfer_news?(title)
     # 移籍関連のキーワードを含むタイトルのみを抽出
