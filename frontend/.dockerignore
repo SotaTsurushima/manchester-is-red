@@ -1,0 +1,44 @@
+# flyctl launch added from .gitignore
+# Nuxt dev/build outputs
+**/.output
+**/.data
+**/.nuxt
+**/.nitro
+**/.cache
+**/dist
+
+# Node dependencies
+**/node_modules
+
+# Logs
+**/logs
+**/*.log
+
+# Misc
+**/.DS_Store
+**/.fleet
+**/.idea
+
+# Local env files
+**/.env
+**/.env.*
+!**/.env.example
+
+# flyctl launch added from node_modules/tailwindcss/stubs/.gitignore
+!node_modules/tailwindcss/stubs/**/*
+fly.toml
+
+# Editor/IDE
+**/.vscode
+**/*.swp
+**/*.swo
+
+# OS
+**/Thumbs.db
+
+# Test/Coverage
+**/coverage
+
+# Docs
+**/docs
+**/*.md

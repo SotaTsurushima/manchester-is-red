@@ -1,55 +1,43 @@
 # See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
 
-# Ignore git directory.
-/.git/
-/.gitignore
+# Git
+.git
+.gitignore
 
-# Ignore bundler config.
-/.bundle
+# Bundler
+.bundle
 
-# Ignore all environment files.
-/.env*
-
-# Ignore all default key files.
+# 環境変数・認証情報
+.env*
 /config/master.key
 /config/credentials/*.key
 
-# Ignore all logfiles and tempfiles.
+# ログ・一時ファイル
 /log/*
 /tmp/*
 !/log/.keep
 !/tmp/.keep
-
-# Ignore pidfiles, but keep the directory.
 /tmp/pids/*
 !/tmp/pids/.keep
-
-# Ignore storage (uploaded files in development and any SQLite databases).
 /storage/*
 !/storage/.keep
 /tmp/storage/*
 !/tmp/storage/.keep
 
-# Ignore CI service files.
-/.github
+# CI・デプロイ・開発用
+.github
+.config/deploy*.yml
+.kamal
+.devcontainer
 
-# Ignore Kamal files.
-/config/deploy*.yml
-/.kamal
+# Docker関連
+.dockerignore
+Dockerfile*
 
-# Ignore development files
-/.devcontainer
-
-# Ignore Docker-related files
-/.dockerignore
-/Dockerfile*
-
-# テスト関連
+# テスト・ドキュメント
 /test/
 /spec/
 /coverage/
-
-# ドキュメント
 *.md
 /doc/
 /docs/
@@ -60,7 +48,7 @@
 .ruby-version
 .byebug_history
 
-# エディタ/IDE設定
+# エディタ/IDE
 .idea/
 .vscode/
 *.swp
@@ -70,11 +58,17 @@
 /public/assets
 /public/packs
 /public/packs-test
-/node_modules
-/yarn-error.log
 .sass-cache/
+tmp/cache/
 
-# その他の一時ファイル
+# その他
+.DS_Store
+Thumbs.db
 *.log
 *.sqlite3
 *.sqlite3-journal
+
+# npm/yarnのキャッシュやロックファイル（必要に応じて）
+npm-debug.log
+package-lock.json
+yarn.lock
