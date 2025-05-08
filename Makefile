@@ -42,8 +42,7 @@ rubocop:
 	docker compose exec backend bundle exec rubocop -A
 cleanup:
 	docker compose down -v
-
-# バックエンドのみリスタート
-backend-restart:
-	docker compose stop backend
-	docker compose up -d backend
+dsu:
+	docker-sync-stack start
+dss:
+	docker-sync-stack stop
