@@ -1,0 +1,31 @@
+# render.yamlの詳細設定例
+services:
+  - type: web
+    name: manchester-is-red-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: manchester-is-red-db
+          property: connectionString
+
+  - type: web
+    name: manchester-is-red-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://manchester-is-red-backend.onrender.com
+
+databases:
+  - name: manchester-is-red-db
+    databaseName: manchester_is_red
+    user: manchester_is_red
+    plan: free

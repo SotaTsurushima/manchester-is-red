@@ -29,6 +29,10 @@ COPY --from=builder /usr/local/bundle /usr/local/bundle
 COPY . .
 
 # 環境設定
-ENV RAILS_ENV="development"
+ENV RAILS_ENV="production"
 
-CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
+# 起動スクリプトのコピーと実行権限の付与
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+CMD ["/app/entrypoint.sh"]

@@ -14,7 +14,6 @@ services:
   backend:
     build: ./backend
     volumes:
-      # - ./backend:/app
       - backend-sync:/app:nocopy
       - bundle_cache:/usr/local/bundle
     container_name: backend
@@ -22,7 +21,6 @@ services:
       - .env
     ports:
       - "8000:8000"
-    command: bash -c "mkdir -p tmp/pids && rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0 -p 8000"
     stdin_open: true
     tty: true
     depends_on:
@@ -36,7 +34,7 @@ services:
       - ./frontend:/app
     ports:
       - "3000:3000"
-    command: yarn dev --host 0.0.0.0
+    command: yarn start
     depends_on:
       - backend
 
