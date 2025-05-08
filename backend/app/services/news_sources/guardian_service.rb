@@ -7,11 +7,15 @@ module NewsSources
     base_uri 'https://content.guardianapis.com'
 
     def get_transfer_news
+      from_date = (Date.today - 14).strftime('%Y-%m-%d') # 2週間前の日付をYYYY-MM-DD形式で
       params = {
         'api-key' => ENV['GUARDIAN_API_KEY'],
         'page-size' => 10,
         'show-fields' => 'headline,trailText,thumbnail',
-        'tag' => 'football/manchester-united'
+        'tag' => 'football/manchester-united',
+        'q' => 'transfer OR signing OR deal OR contract OR bid OR move',
+        'order-by' => 'newest',
+        'from-date' => from_date
       }
       response = self.class.get('/search', query: params)
       raise "Failed to fetch news. Status: #{response.code}" unless response.success?
