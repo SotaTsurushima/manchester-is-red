@@ -14,7 +14,8 @@ services:
   backend:
     build: ./backend
     volumes:
-      - ./backend:/app
+      # - ./backend:/app
+      - backend-sync:/app:nocopy
       - bundle_cache:/usr/local/bundle
     container_name: backend
     env_file:
@@ -56,3 +57,5 @@ volumes:
   db-data:
   bundle_cache:
   minio-data:
+  backend-sync:
+    external: true

@@ -1,0 +1,14 @@
+version: "2"
+options:
+  verbose: true
+syncs:
+  backend-sync:
+    src: "./backend"
+    sync_container_path: "/app"
+    sync_strategy: "unison"
+    sync_excludes:
+      - "log/*"
+      - "tmp/*"
+      - ".git"
+      - "node_modules"
+      - "vendor/bundle"
