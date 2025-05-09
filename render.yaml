@@ -4,6 +4,7 @@ services:
     name: manchester-is-red-backend
     env: docker
     dockerfilePath: ./backend/Dockerfile.prod
+    rootDir: ./backend
     plan: free
     healthCheckPath: /
     envVars:
