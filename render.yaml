@@ -3,7 +3,7 @@ services:
   - type: web
     name: manchester-is-red-backend
     env: docker
-    dockerfilePath: ./backend/Dockerfile
+    dockerfilePath: ./backend/Dockerfile.prod
     plan: free
     healthCheckPath: /
     envVars:
@@ -17,7 +17,7 @@ services:
   - type: web
     name: manchester-is-red-frontend
     env: docker
-    dockerfilePath: ./frontend/Dockerfile
+    dockerfilePath: ./frontend/Dockerfile.prod
     plan: free
     healthCheckPath: /
     envVars:
