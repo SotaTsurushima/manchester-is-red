@@ -3,8 +3,10 @@ FROM node:20-slim AS builder
 WORKDIR /app
 
 # 依存関係のインストール
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY package.json ./
+COPY yarn.lock* ./  # yarn.lockが存在する場合のみコピー
+
+RUN yarn install
 
 # ソースコードのコピー
 COPY . .
@@ -12,6 +14,7 @@ COPY . .
 # 本番用ビルド
 RUN yarn build
 
+# 本番環境ステージ
 FROM node:20-slim
 WORKDIR /app
 
@@ -25,10 +28,10 @@ RUN apt-get update -qq && \
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/yarn.lock ./yarn.lock
+COPY --from=builder /app/yarn.lock* ./  # yarn.lockが存在する場合のみコピー
 
 # 本番用の依存関係のみをインストール
-RUN yarn install --production --frozen-lockfile
+RUN yarn install --production
 
 # 環境設定
 ENV NODE_ENV="production"
