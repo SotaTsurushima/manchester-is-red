@@ -28,11 +28,4 @@ RUN apt-get update -qq && \
 COPY --from=builder /usr/local/bundle /usr/local/bundle
 COPY . .
 
-# 環境設定
-ENV RAILS_ENV="production"
-
-# 起動スクリプトのコピーと実行権限の付与
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-
-CMD ["/app/entrypoint.sh"]
+CMD ["sh", "-c", "mkdir -p tmp/pids && rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0 -p 8000"]

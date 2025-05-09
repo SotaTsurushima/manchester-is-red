@@ -32,7 +32,6 @@
 
 # Docker関連
 .dockerignore
-Dockerfile*
 
 # テスト・ドキュメント
 /test/

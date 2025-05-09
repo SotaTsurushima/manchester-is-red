@@ -13,14 +13,17 @@ services:
 
   backend:
     build: ./backend
+    environment:
+      - RAILS_ENV=development
+      - PORT=${BACKEND_PORT}
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     volumes:
       - backend-sync:/app:nocopy
       - bundle_cache:/usr/local/bundle
     container_name: backend
     env_file:
       - .env
-    ports:
-      - "8000:8000"
     stdin_open: true
     tty: true
     depends_on:
@@ -29,12 +32,14 @@ services:
 
   frontend:
     build: ./frontend
+    environment:
+      - NODE_ENV=development
+      - PORT=${FRONTEND_PORT}
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     container_name: frontend
     volumes:
       - ./frontend:/app
-    ports:
-      - "3000:3000"
-    command: yarn start
     depends_on:
       - backend
 
