@@ -2,8 +2,9 @@
 FROM node:20-slim AS builder
 WORKDIR /app
 
-COPY ./package.json* ./
-COPY ./yarn.lock* ./
+# 依存関係のインストール
+COPY package.json ./
+COPY yarn.lock* ./
 
 # 依存関係のインストール
 RUN yarn install
