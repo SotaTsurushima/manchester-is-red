@@ -2,7 +2,10 @@ FROM node:20-slim
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+# package.jsonのみをコピー
+COPY package.json ./
+# yarn.lockが存在する場合のみコピー
+COPY yarn.lock* ./
 # バージョンの整合性を保つ？
 RUN yarn install --frozen-lockfile
 
