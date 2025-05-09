@@ -1,0 +1,38 @@
+# ビルドステージ
+FROM node:20-slim AS builder
+WORKDIR /app
+
+# 依存関係のインストール
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+# ソースコードのコピー
+COPY . .
+
+# 本番用ビルド
+RUN yarn build
+
+FROM node:20-slim
+WORKDIR /app
+
+# 必要な最小限のパッケージをインストール
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# ビルド成果物のコピー
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/yarn.lock ./yarn.lock
+
+# 本番用の依存関係のみをインストール
+RUN yarn install --production --frozen-lockfile
+
+# 環境設定
+ENV NODE_ENV="production"
+ENV PORT=3000
+
+# 起動コマンド
+CMD ["yarn", "start"]
