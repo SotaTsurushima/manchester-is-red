@@ -1,5 +1,5 @@
-# マルチステージビルド
-FROM ruby:3.2.2 AS builder
+# ビルドステージ
+FROM ruby:3.2.2-slim AS builder
 WORKDIR /app
 
 # 必要な最小限のパッケージをインストール
@@ -8,13 +8,21 @@ RUN apt-get update -qq && \
     build-essential \
     default-mysql-client \
     default-libmysqlclient-dev \
-    libyaml-dev && \
+    libyaml-dev \
+    git && \
     rm -rf /var/lib/apt/lists/*
 
+# 依存関係のインストール
 COPY Gemfile* ./
-RUN bundle install
+RUN bundle config set --local without 'development test' && \
+    bundle install --jobs 4 --retry 3
 
-FROM ruby:3.2.2
+# アセットのプリコンパイル
+COPY . .
+RUN bundle exec rake assets:precompile
+
+# 本番環境ステージ
+FROM ruby:3.2.2-slim
 WORKDIR /app
 
 # 必要な最小限のパッケージをインストール
@@ -25,15 +33,24 @@ RUN apt-get update -qq && \
     libyaml-dev && \
     rm -rf /var/lib/apt/lists/*
 
+# ビルド成果物のコピー
 COPY --from=builder /usr/local/bundle /usr/local/bundle
+COPY --from=builder /app/public/assets /app/public/assets
+COPY --from=builder /app/public/packs /app/public/packs
 COPY . .
 
 # 環境設定
 ENV RAILS_ENV="production"
 ENV RAILS_SERVE_STATIC_FILES=true
+ENV RAILS_LOG_TO_STDOUT=true
+ENV RAILS_MAX_THREADS=5
+ENV WEB_CONCURRENCY=2
+ENV SECRET_KEY_BASE=dummy_key_for_build
 
-# アセットのプリコンパイル
-RUN bundle exec rake assets:precompile
+# セキュリティ設定
+RUN adduser --disabled-password --gecos '' appuser && \
+    chown -R appuser:appuser /app
 
 # 起動コマンド
+USER appuser
 CMD ["sh", "-c", "mkdir -p tmp/pids && rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0 -p 8000"]
