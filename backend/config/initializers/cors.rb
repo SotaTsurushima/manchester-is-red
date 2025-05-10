@@ -7,7 +7,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
 
     # 本番環境の設定
     if Rails.env.production?
-      origins 'https://manchester-is-red-frontend.onrender.com', 'http://manchester-is-red-frontend.onrender.com'
+      origins 'https://manchester-is-red.onrender.com', 'http://manchester-is-red.onrender.com'
     end
 
     resource "*",

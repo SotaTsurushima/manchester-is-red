@@ -13,8 +13,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       baseUrl: process.env.NODE_ENV === 'production' 
-        ? 'https://manchester-is-red-backend.onrender.com'  // 本番環境のURL
-        : 'http://localhost:8000',  // 開発環境のURL
+        ? 'https://manchester-is-red-backend.onrender.com'  // バックエンドのURL
+        : 'http://localhost:8000',
       MINIO_BASE_URL: process.env.MINIO_BASE_URL || 'http://localhost:9000/manchester-united-bucket'
     }
   },
