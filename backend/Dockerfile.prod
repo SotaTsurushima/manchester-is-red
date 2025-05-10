@@ -1,3 +1,6 @@
+# =======================
+# ビルドステージ
+# =======================
 FROM ruby:3.2.2 AS builder
 WORKDIR /app
 
@@ -9,9 +12,13 @@ RUN apt-get update -qq && \
     libyaml-dev && \
     rm -rf /var/lib/apt/lists/*
 
-COPY Gemfile Gemfile.lock ./
+# ✅ backend 以下から Gemfile をコピー
+COPY backend/Gemfile backend/Gemfile.lock ./
 RUN bundle install
 
+# =======================
+# 本番ステージ
+# =======================
 FROM ruby:3.2.2
 WORKDIR /app
 
@@ -22,14 +29,14 @@ RUN apt-get update -qq && \
     libyaml-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# ✅ 必須: Gemfileを含めてコピー
-COPY Gemfile Gemfile.lock ./
+# ✅ Gemfile を再度コピー（本番環境で必要）
+COPY backend/Gemfile backend/Gemfile.lock ./
 
-# ✅ bundle install 済みの gem をコピー
+# ✅ ビルド済みの gem をコピー
 COPY --from=builder /usr/local/bundle /usr/local/bundle
 
-# ✅ アプリ全体をコピー
-COPY . .
+# ✅ backend ディレクトリ全体をコピー
+COPY backend/ ./
 
 ENV RAILS_ENV=production
 ENV RAILS_SERVE_STATIC_FILES=true
