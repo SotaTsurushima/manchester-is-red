@@ -23,7 +23,7 @@ FROM node:20-slim
 
 # アプリケーションディレクトリの作成
 RUN mkdir -p frontend /app
-WORKDIR frontend/app
+WORKDIR frontend /app
 
 # 必要な最小限のパッケージをインストール
 RUN apt-get update -qq && \
