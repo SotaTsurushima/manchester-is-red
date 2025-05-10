@@ -4,7 +4,7 @@ services:
     name: manchester-is-red-backend
     env: docker
     dockerfilePath: ./backend/Dockerfile.prod
-    rootDir: ./backend
+    rootDir: .
     plan: free
     healthCheckPath: /
     envVars:
@@ -36,6 +36,5 @@ databases:
     user: manchester_is_red
     plan: free
     ipAllowList: []
-    # MySQLの設定を追加
     engine: mysql
     version: "8.0"

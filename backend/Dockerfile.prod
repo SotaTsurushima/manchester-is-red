@@ -11,7 +11,7 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/*
 
 # Gemfile類をコピーして依存関係をインストール
-COPY Gemfile* ./
+COPY backend/Gemfile backend/Gemfile.lock ./
 RUN bundle install
 
 # === 本番ステージ ===
