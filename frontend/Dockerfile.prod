@@ -6,8 +6,8 @@ RUN mkdir -p /app
 WORKDIR /app
 
 # 依存関係のインストール
-# COPY package.json ./
-# COPY yarn.lock* ./
+COPY backend/package.json ./
+COPY backend/yarn.lock* ./
 
 # 依存関係のインストール
 RUN yarn install

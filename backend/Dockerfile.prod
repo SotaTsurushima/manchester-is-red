@@ -1,27 +1,39 @@
-FROM ruby:3.2.2
-
-# 必要なパッケージのインストール
-RUN apt-get update -qq && \
-    apt-get install -y build-essential libpq-dev nodejs
-
-# アプリケーションディレクトリの作成
-RUN mkdir /app
+# マルチステージビルド
+FROM ruby:3.2.2 AS builder
 WORKDIR /app
 
-# Gemfileのコピーとインストール
-COPY backend/Gemfile /app/Gemfile
-COPY backend/Gemfile.lock /app/Gemfile.lock
+# 必要な最小限のパッケージをインストール
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    default-mysql-client \
+    default-libmysqlclient-dev \
+    libyaml-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY backend/Gemfile* ./
 RUN bundle install
 
-# アプリケーションのコピー
-COPY backend /app
+FROM ruby:3.2.2
+WORKDIR backend /app
+
+# 必要な最小限のパッケージをインストール
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    default-mysql-client \
+    default-libmysqlclient-dev \
+    libyaml-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/local/bundle /usr/local/bundle
+COPY . .
 
 # 環境設定
-ENV RAILS_ENV=production
+ENV RAILS_ENV="production"
 ENV RAILS_SERVE_STATIC_FILES=true
 
-# ポートの公開
-EXPOSE 3000
+# アセットのプリコンパイル
+RUN bundle exec rake assets:precompile
 
 # 起動コマンド
-CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
+CMD ["sh", "-c", "mkdir -p tmp/pids && rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0 -p 8000"]
