@@ -1,59 +1,27 @@
-# ビルドステージ
-FROM ruby:3.2.2-slim AS builder
-RUN mkdir /app
-WORKDIR /app
+FROM ruby:3.2.2
 
 # 必要なパッケージのインストール
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    build-essential \
-    default-mysql-client \
-    default-libmysqlclient-dev \
-    libyaml-dev \
-    git && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y build-essential libpq-dev nodejs
 
-# 依存関係のインストール
-ADD Gemfile /app/Gemfile
-ADD Gemfile.lock /app/Gemfile.lock
-RUN bundle config set --local without 'development test' && \
-    bundle install --jobs 4 --retry 3
-
-# アセットのプリコンパイル
-ADD . /app
-RUN bundle exec rake assets:precompile
-
-# 本番環境ステージ
-FROM ruby:3.2.2-slim
+# アプリケーションディレクトリの作成
 RUN mkdir /app
 WORKDIR /app
 
-# 必要な最小限のパッケージをインストール
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    default-mysql-client \
-    default-libmysqlclient-dev \
-    libyaml-dev && \
-    rm -rf /var/lib/apt/lists/*
+# Gemfileのコピーとインストール
+COPY Gemfile /app/Gemfile
+COPY Gemfile.lock /app/Gemfile.lock
+RUN bundle install
 
-# ビルド成果物のコピー
-COPY --from=builder /usr/local/bundle /usr/local/bundle
-COPY --from=builder /app/public/assets /app/public/assets
-COPY --from=builder /app/public/packs /app/public/packs
-ADD . /app
+# アプリケーションのコピー
+COPY . /app
 
 # 環境設定
-ENV RAILS_ENV="production"
+ENV RAILS_ENV=production
 ENV RAILS_SERVE_STATIC_FILES=true
-ENV RAILS_LOG_TO_STDOUT=true
-ENV RAILS_MAX_THREADS=5
-ENV WEB_CONCURRENCY=2
-ENV SECRET_KEY_BASE=dummy_key_for_build
 
-# セキュリティ設定
-RUN adduser --disabled-password --gecos '' appuser && \
-    chown -R appuser:appuser /app
+# ポートの公開
+EXPOSE 3000
 
 # 起動コマンド
-USER appuser
-CMD ["sh", "-c", "mkdir -p tmp/pids && rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0 -p 8000"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
