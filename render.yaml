@@ -14,6 +14,10 @@ services:
         fromDatabase:
           name: manchester-is-red-db
           property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: SECRET_KEY_BASE
+        sync: false
 
   - type: web
     name: manchester-is-red-frontend
