@@ -15,7 +15,7 @@ COPY backend/Gemfile* ./
 RUN bundle install
 
 FROM ruby:3.2.2
-WORKDIR backend /app
+WORKDIR backend/app
 
 # 必要な最小限のパッケージをインストール
 RUN apt-get update -qq && \
