@@ -1,48 +1,38 @@
 # ビルドステージ
 FROM node:20-slim AS builder
 
-# アプリケーションディレクトリの作成
-RUN mkdir -p frontend/app
-WORKDIR frontend/app
+WORKDIR /app
 
 # 依存関係のインストール
-COPY frontend/package.json ./
-COPY frontend/yarn.lock* ./
-
-# 依存関係のインストール
+COPY frontend/package.json frontend/yarn.lock* ./
 RUN yarn install
 
 # ソースコードのコピー
-COPY . .
-
-# 本番用ビルド
+COPY frontend ./
 RUN yarn build
 
-# 本番環境ステージ
+# 本番ステージ
 FROM node:20-slim
 
-# アプリケーションディレクトリの作成
-RUN mkdir -p frontend/app
-WORKDIR frontend/app
+WORKDIR /app
 
-# 必要な最小限のパッケージをインストール
+# 必要パッケージ
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# ビルド成果物のコピー
+# ビルド成果物と依存関係のコピー
 COPY --from=builder /app/.output ./.output
-COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/yarn.lock* ./
-
-# 本番用の依存関係のみをインストール
+COPY --from=builder /app/yarn.lock* ./yarn.lock
 RUN yarn install --production
 
 # 環境設定
-ENV NODE_ENV="production"
+ENV NODE_ENV=production
 ENV PORT=3000
 
-# 起動コマンド
-CMD ["yarn", "start"]
+EXPOSE 3000
+
+# Nuxtのサーバを起動
+CMD ["node", ".output/server/index.mjs"]

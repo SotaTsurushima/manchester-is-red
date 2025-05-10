@@ -23,7 +23,7 @@ services:
     name: manchester-is-red-frontend
     env: docker
     dockerfilePath: ./frontend/Dockerfile.prod
-    rootDir: ./frontend
+    rootDir: ./
     plan: free
     healthCheckPath: /
     envVars:
