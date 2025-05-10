@@ -1,6 +1,8 @@
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins "http://localhost:3000"
+    origins 'http://localhost:3000' if Rails.env.development?
+
+    origins 'https://manchester-is-red-frontend.onrender.com' if Rails.env.production?
 
     resource "*",
       headers: :any,
