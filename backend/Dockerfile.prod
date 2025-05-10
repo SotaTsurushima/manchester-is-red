@@ -1,8 +1,7 @@
-# マルチステージビルド
 FROM ruby:3.2.2 AS builder
 WORKDIR /app
 
-# 必要な最小限のパッケージをインストール
+# 必要パッケージのインストール
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     build-essential \
@@ -11,13 +10,15 @@ RUN apt-get update -qq && \
     libyaml-dev && \
     rm -rf /var/lib/apt/lists/*
 
-COPY backend/Gemfile* ./
+# Gemfile類をコピーして依存関係をインストール
+COPY Gemfile* ./
 RUN bundle install
 
+# === 本番ステージ ===
 FROM ruby:3.2.2
-WORKDIR backend/app
+WORKDIR /app
 
-# 必要な最小限のパッケージをインストール
+# 必要パッケージの再インストール（ランタイム用）
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     default-mysql-client \
@@ -25,12 +26,15 @@ RUN apt-get update -qq && \
     libyaml-dev && \
     rm -rf /var/lib/apt/lists/*
 
+# バンドル済みGemをコピー
 COPY --from=builder /usr/local/bundle /usr/local/bundle
+
+# アプリの全ファイルをコピー
 COPY . .
 
-# 環境設定
-ENV RAILS_ENV="production"
+# Rails設定
+ENV RAILS_ENV=production
 ENV RAILS_SERVE_STATIC_FILES=true
 
-# 起動コマンド
+# Railsの起動コマンド
 CMD ["sh", "-c", "mkdir -p tmp/pids && rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0 -p 8000"]
