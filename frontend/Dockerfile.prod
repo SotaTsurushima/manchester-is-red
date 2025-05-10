@@ -1,9 +1,13 @@
 # ビルドステージ
 FROM node:20-slim AS builder
+
+# アプリケーションディレクトリの作成
+RUN mkdir -p /app
 WORKDIR /app
 
+# 依存関係のインストール
 # COPY package.json ./
-COPY yarn.lock* ./
+# COPY yarn.lock* ./
 
 # 依存関係のインストール
 RUN yarn install
@@ -16,6 +20,9 @@ RUN yarn build
 
 # 本番環境ステージ
 FROM node:20-slim
+
+# アプリケーションディレクトリの作成
+RUN mkdir -p /app
 WORKDIR /app
 
 # 必要な最小限のパッケージをインストール
