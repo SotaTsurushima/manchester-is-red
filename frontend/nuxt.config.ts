@@ -12,7 +12,9 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      baseUrl: 'http://localhost:8000',  // APIのベースURLを設定
+      baseUrl: process.env.NODE_ENV === 'production' 
+        ? 'https://manchester-is-red-backend.onrender.com'  // 本番環境のURL
+        : 'http://localhost:8000',  // 開発環境のURL
       MINIO_BASE_URL: process.env.MINIO_BASE_URL || 'http://localhost:9000/manchester-united-bucket'
     }
   },
