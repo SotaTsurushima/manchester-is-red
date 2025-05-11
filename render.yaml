@@ -12,7 +12,7 @@ services:
         value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: manchester-is-red-db
+          name: manchester_is_red
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
