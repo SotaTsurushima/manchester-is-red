@@ -1,4 +1,3 @@
-# render.yamlの詳細設定例
 services:
   - type: web
     name: manchester-is-red-backend
@@ -12,7 +11,7 @@ services:
         value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: manchester_is_red
+          name: manchester-is-red-db  # PostgreSQL用にデータベース名を合わせる
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
@@ -23,7 +22,7 @@ services:
     name: manchester-is-red-frontend
     env: docker
     dockerfilePath: ./frontend/Dockerfile.prod
-    rootDir: ./
+    rootDir: ./ 
     plan: free
     healthCheckPath: /
     envVars:
@@ -31,10 +30,10 @@ services:
         value: https://manchester-is-red-backend.onrender.com
 
 databases:
-  - name: manchester-is-red-db
+  - name: manchester-is-red-db  # PostgreSQLのデータベース名
     databaseName: manchester_is_red
     user: manchester_is_red
     plan: free
     ipAllowList: []
-    engine: mysql
-    version: "8.0"
+    engine: postgres  # MySQLからPostgreSQLに変更
+    version: "13"  # PostgreSQLのバージョン（Renderに合わせて変更）
