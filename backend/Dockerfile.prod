@@ -7,14 +7,15 @@ WORKDIR /app
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     build-essential \
-    default-mysql-client \
-    default-libmysqlclient-dev \
+    libpq-dev \
     libyaml-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# ✅ backend 以下から Gemfile をコピー
 COPY backend/Gemfile backend/Gemfile.lock ./
-RUN bundle install
+
+# ✅ 本番用Gemのみインストール
+ENV RAILS_ENV=production
+RUN bundle install --without development test
 
 # =======================
 # 本番ステージ
@@ -24,21 +25,17 @@ WORKDIR /app
 
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
-    default-mysql-client \
-    default-libmysqlclient-dev \
+    libpq-dev \
     libyaml-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# ✅ Gemfile を再度コピー（本番環境で必要）
 COPY backend/Gemfile backend/Gemfile.lock ./
-
-# ✅ ビルド済みの gem をコピー
 COPY --from=builder /usr/local/bundle /usr/local/bundle
-
-# ✅ backend ディレクトリ全体をコピー
 COPY backend/ ./
 
+# ✅ 本番用環境変数
 ENV RAILS_ENV=production
 ENV RAILS_SERVE_STATIC_FILES=true
 
+# ✅ Puma 起動前の準備
 CMD ["sh", "-c", "mkdir -p tmp/pids && rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0 -p 8000"]
