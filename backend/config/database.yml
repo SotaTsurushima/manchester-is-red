@@ -1,15 +1,11 @@
 default: &default
-  adapter: mysql2
-  encoding: utf8mb4
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: root
-  password: password
-  host: db
+  timeout: 5000
 
 development:
+  <<: *default
   adapter: mysql2
-  encoding: utf8
-  pool: 5
+  encoding: utf8mb4
   username: root
   password: password
   host: db
@@ -17,7 +13,14 @@ development:
 
 test:
   <<: *default
+  adapter: mysql2
+  encoding: utf8mb4
+  username: root
+  password: password
+  host: db
   database: app_test
 
 production:
+  <<: *default
+  adapter: postgresql
   url: <%= ENV["DATABASE_URL"] %>
