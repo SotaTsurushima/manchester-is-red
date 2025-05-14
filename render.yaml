@@ -10,7 +10,7 @@ services:
       mkdir -p tmp/pids && \
       rm -f tmp/pids/server.pid && \
       bundle exec rails db:migrate && \
-      bundle exec rails server -b 0.0.0.0 -p $PORT
+      bundle exec rails server -b 0.0.0.0 -p 8000
     envVars:
       - key: RAILS_ENV
         value: production
