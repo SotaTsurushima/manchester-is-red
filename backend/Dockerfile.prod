@@ -39,4 +39,9 @@ ENV RAILS_ENV=production
 ENV RAILS_SERVE_STATIC_FILES=true
 
 # CMD ["sh", "-c", "mkdir -p tmp/pids && rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0 -p 8000"]
-CMD ["bundle", "exec", "rails", "db:migrate"]
+# entrypoint.deploy.sh をコンテナにコピーして実行権限を付与
+COPY ./backend/entrypoint.deploy.sh /usr/bin/entrypoint.deploy.sh
+RUN chmod +x /usr/bin/entrypoint.deploy.sh
+
+# 起動時にスクリプトを実行
+ENTRYPOINT ["/usr/bin/entrypoint.deploy.sh"]
