@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "🟡 Precompiling assets..."
-bundle exec rails assets:precompile
+# echo "🟡 Precompiling assets..."
+# bundle exec rails assets:precompile
 
 echo "🟠 Cleaning old assets..."
 bundle exec rails assets:clean
