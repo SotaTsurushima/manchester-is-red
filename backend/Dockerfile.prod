@@ -26,7 +26,8 @@ WORKDIR /app
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     libpq-dev \
-    libyaml-dev && \
+    libyaml-dev \
+    postgresql-client && \
     rm -rf /var/lib/apt/lists/*
 
 COPY backend/Gemfile backend/Gemfile.lock ./
@@ -37,5 +38,4 @@ COPY backend/ ./
 ENV RAILS_ENV=production
 ENV RAILS_SERVE_STATIC_FILES=true
 
-# ✅ Puma 起動前の準備
 CMD ["sh", "-c", "mkdir -p tmp/pids && rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0 -p 8000"]
