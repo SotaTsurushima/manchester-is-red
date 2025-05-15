@@ -6,6 +6,9 @@ services:
     rootDir: .
     plan: free
     healthCheckPath: /
+    buildCommand: bundle install && bundle exec rake assets:precompile
+    startCommand: bundle exec rails server -b 0.0.0.0 -p 3000
+    migrateCommand: bundle exec rails db:migrate
     envVars:
       - key: RAILS_ENV
         value: production
