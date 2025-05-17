@@ -1,7 +1,7 @@
 class PlayersController < ApplicationController
   def index
     players = Player.all
-    render_success(players.as_json(only: [:id, :name, :number, :position, :image]))
+    render_success(players.as_json)
   end
 
   def show
