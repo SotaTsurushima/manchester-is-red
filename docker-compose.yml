@@ -14,12 +14,11 @@ services:
   backend:
     build: ./backend
     environment:
-      - RAILS_ENV=development
-      - PORT=${BACKEND_PORT}
+      RAILS_ENV: development
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "8000:8000"
     volumes:
-      - backend-sync:/app:nocopy
+      - ./backend:/app
       - bundle_cache:/usr/local/bundle
     container_name: backend
     env_file:
@@ -33,10 +32,9 @@ services:
   frontend:
     build: ./frontend
     environment:
-      - NODE_ENV=development
-      - PORT=${FRONTEND_PORT}
+      NODE_ENV: development
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "3000:3000"
     container_name: frontend
     volumes:
       - ./frontend:/app
