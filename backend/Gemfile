@@ -23,6 +23,8 @@ gem "thruster", require: false
 gem 'nokogiri'
 gem 'aws-sdk-s3'
 gem 'rss'
+gem 'sidekiq'
+gem 'sidekiq-scheduler'
 
 group :development do
   gem "pry"

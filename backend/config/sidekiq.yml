@@ -1,0 +1,5 @@
+:concurrency: 5
+:schedule:
+  fetch_stats_worker:
+    cron: "0 * * * *" # 毎時0分に実行
+    class: FetchStatsWorker
