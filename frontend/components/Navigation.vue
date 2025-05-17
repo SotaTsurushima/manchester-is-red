@@ -44,7 +44,7 @@ const navItems = [
   { href: '/matches', text: 'Matches' },
   { href: '/transfers', text: 'Transfer' },
   { href: '/injury', text: 'Injury Report' },
-  // { href: '/rating', text: 'Rating' },
+  { href: '/stats', text: 'Stat Kings' },
   // { href: '/value', text: 'Player Value' },
   // { href: '/mvp', text: 'MVP' },
 ]
