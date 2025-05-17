@@ -16,92 +16,34 @@
         </button>
       </div>
       <LoadingSpinner v-if="loading" />
-      <StatsTable v-else :players="players" :stat-label="statLabel" :stat-key="statKey" />
+      <StatsTable :players="players" :stat-label="statLabel" :stat-key="statKey" />
     </div>
   </Background>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useApi } from '~/composables/api'
 import Background from '~/components/Background.vue'
 import Title from '~/components/Title.vue'
 import LoadingSpinner from '~/components/LoadingSpinner.vue'
 import StatsTable from '~/components/StatsTable.vue'
 
-const tabs = ['Goals', 'Assists', 'Yellow cards', 'Red cards']
+const tabs = ['Goals', 'Assists']
 const activeTab = ref('Goals')
 const loading = ref(true)
+const players = ref([])
 
-// データ例
-const topScorers = [
-  {
-    rank: 1,
-    name: 'Mohamed Salah',
-    team: 'Liverpool',
-    teamLogo: '/teams/liverpool.png',
-    goals: 28,
-    photo: '/players/salah.png'
+const statLabel = computed(() => activeTab.value)
+const statKey = computed(() => (activeTab.value === 'Goals' ? 'goals' : 'assists'))
+
+const api = useApi()
+
+onMounted(async () => {
+  const res = await api.get('/players')
+  if (res.success) {
+    players.value = res.data
   }
-  // ...他の選手
-]
-const topAssists = [
-  // ...アシストデータ
-]
-const topYellowCards = [
-  // ...イエローカードデータ
-]
-const topRedCards = [
-  // ...レッドカードデータ
-]
-
-const players = computed(() => {
-  switch (activeTab.value) {
-    case 'Goals':
-      return topScorers
-    case 'Assists':
-      return topAssists
-    case 'Yellow cards':
-      return topYellowCards
-    case 'Red cards':
-      return topRedCards
-    default:
-      return []
-  }
-})
-
-const statLabel = computed(() => {
-  switch (activeTab.value) {
-    case 'Goals':
-      return 'Goals'
-    case 'Assists':
-      return 'Assists'
-    case 'Yellow cards':
-      return 'Yellow Cards'
-    case 'Red cards':
-      return 'Red Cards'
-    default:
-      return ''
-  }
-})
-
-const statKey = computed(() => {
-  switch (activeTab.value) {
-    case 'Goals':
-      return 'goals'
-    case 'Assists':
-      return 'assists'
-    case 'Yellow cards':
-      return 'yellowCards'
-    case 'Red cards':
-      return 'redCards'
-    default:
-      return ''
-  }
-})
-
-onMounted(() => {
-  setTimeout(() => {
-    loading.value = false
-  }, 1200)
+  loading.value = false
 })
 </script>
