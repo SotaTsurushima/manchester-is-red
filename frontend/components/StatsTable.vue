@@ -1,47 +1,28 @@
 <template>
-  <div class="bg-[#18191A] min-h-screen text-white p-6">
-    <div class="max-w-2xl mx-auto">
-      <h2 class="text-2xl font-bold mb-4">Stats</h2>
-      <div class="flex border-b border-gray-700 mb-2">
-        <button
-          v-for="tab in tabs"
-          :key="tab"
-          @click="activeTab = tab"
-          :class="[
-            'px-4 py-2 text-sm font-medium focus:outline-none',
-            activeTab === tab ? 'border-b-2 border-white text-white' : 'text-gray-400'
-          ]"
-        >
-          {{ tab }}
-        </button>
+  <div>
+    <div class="flex justify-between px-4 py-2 text-gray-400 text-xs border-b border-gray-700">
+      <span>Player</span>
+      <span class="text-right">{{ statLabel }}</span>
+    </div>
+    <div
+      v-for="player in players"
+      :key="player.name"
+      class="flex items-center px-4 py-3 border-b border-gray-800 last:border-b-0"
+    >
+      <span class="w-6 text-gray-400">{{ player.rank }}</span>
+      <img :src="player.photo" alt="photo" class="w-9 h-9 rounded-full mr-3" />
+      <div class="flex-1">
+        <div class="font-medium text-white">{{ player.name }}</div>
       </div>
-      <StatsList
-        v-if="activeTab === 'Goals'"
-        :players="topScorers"
-        stat-label="Goals"
-        stat-key="goals"
-      />
-      <!-- 他のタブも同様に追加可能 -->
+      <span class="w-10 text-right font-semibold text-white">{{ player[statKey] }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import StatsList from '~/components/StatsList.vue'
-
-const tabs = ['Goals', 'Assists', 'Yellow cards', 'Red cards']
-const activeTab = ref('Goals')
-
-const topScorers = [
-  {
-    rank: 1,
-    name: 'Mohamed Salah',
-    team: 'Liverpool',
-    teamLogo: '/teams/liverpool.png',
-    goals: 28,
-    photo: '/players/salah.png'
-  }
-  // ...他の選手
-]
+defineProps({
+  players: Array,
+  statLabel: String,
+  statKey: String
+})
 </script>

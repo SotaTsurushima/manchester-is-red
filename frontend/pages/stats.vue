@@ -1,7 +1,7 @@
 <template>
   <Background>
     <div class="max-w-2xl mx-auto p-6">
-      <h2 class="text-2xl font-bold mb-4">Stats</h2>
+      <Title title="Stats" />
       <div class="flex border-b border-gray-700 mb-2">
         <button
           v-for="tab in tabs"
@@ -24,6 +24,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import Background from '~/components/Background.vue'
+import Title from '~/components/Title.vue'
 import LoadingSpinner from '~/components/LoadingSpinner.vue'
 import StatsTable from '~/components/StatsTable.vue'
 
@@ -31,6 +32,7 @@ const tabs = ['Goals', 'Assists', 'Yellow cards', 'Red cards']
 const activeTab = ref('Goals')
 const loading = ref(true)
 
+// データ例
 const topScorers = [
   {
     rank: 1,
@@ -39,17 +41,33 @@ const topScorers = [
     teamLogo: '/teams/liverpool.png',
     goals: 28,
     photo: '/players/salah.png'
-  },
-  {
-    rank: 2,
-    name: 'Alexander Isak',
-    team: 'Newcastle',
-    teamLogo: '/teams/newcastle.png',
-    goals: 23,
-    photo: '/players/isak.png'
   }
   // ...他の選手
 ]
+const topAssists = [
+  // ...アシストデータ
+]
+const topYellowCards = [
+  // ...イエローカードデータ
+]
+const topRedCards = [
+  // ...レッドカードデータ
+]
+
+const players = computed(() => {
+  switch (activeTab.value) {
+    case 'Goals':
+      return topScorers
+    case 'Assists':
+      return topAssists
+    case 'Yellow cards':
+      return topYellowCards
+    case 'Red cards':
+      return topRedCards
+    default:
+      return []
+  }
+})
 
 const statLabel = computed(() => {
   switch (activeTab.value) {
@@ -81,14 +99,9 @@ const statKey = computed(() => {
   }
 })
 
-const players = computed(() => {
-  // activeTabに応じてデータを切り替え
-  return topScorers
-})
-
 onMounted(() => {
   setTimeout(() => {
     loading.value = false
-  }, 1200) // ローディングのデモ
+  }, 1200)
 })
 </script>
