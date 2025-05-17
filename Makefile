@@ -46,3 +46,7 @@ dsu:
 	docker-sync-stack start
 dss:
 	docker-sync-stack stop
+console:
+	docker compose exec backend rails console
+runner:
+	docker compose exec backend rails runner
