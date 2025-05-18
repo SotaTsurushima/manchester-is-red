@@ -14,7 +14,7 @@ services:
   backend:
     build: ./backend
     environment:
-      RAILS_ENV: development
+      - RAILS_ENV=development
     ports:
       - "8000:8000"
     volumes:
@@ -28,6 +28,7 @@ services:
     depends_on:
       - db
       - minio
+      - selenium
 
   frontend:
     build: ./frontend
@@ -73,6 +74,13 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: selenium
+    ports:
+      - "4444:4444"
+    shm_size: 2g
 
 volumes:
   db-data:
