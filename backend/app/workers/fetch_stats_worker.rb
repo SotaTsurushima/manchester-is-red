@@ -21,7 +21,7 @@ class FetchStatsWorker
       url = "https://www.transfermarkt.com/bruno-fernandes/profil/spieler/240306"
       driver.get(url)
 
-      sleep 5 # JavaScript描画待ち（長めに）
+      sleep 5
 
       # クッキー・トラッキング同意ポップアップを閉じる
       begin
@@ -43,12 +43,11 @@ class FetchStatsWorker
           puts "stat[#{i}]: #{value}"
         end
 
-        # 出場数、ゴール数、アシスト数を取得
-        appearances = stats[0]&.attribute('innerHTML')&.strip
+        # ゴール数、アシスト数を取得
         goals = stats[1]&.attribute('innerHTML')&.strip
         assists = stats[2]&.attribute('innerHTML')&.strip
 
-        puts "✅ Appearances: #{appearances}, Goals: #{goals}, Assists: #{assists}"
+        puts "✅Goals: #{goals}, Assists: #{assists}"
       end
     rescue => e
       puts "❌ エラーが発生しました: #{e.message}"
