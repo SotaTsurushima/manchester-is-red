@@ -1,5 +1,5 @@
 :concurrency: 5
 :schedule:
   fetch_stats_worker:
-    cron: "0 * * * *" # 毎時0分に実行
+    cron: "0 0 */4 * *" # 4日に1回、深夜0時に実行
     class: FetchStatsWorker
