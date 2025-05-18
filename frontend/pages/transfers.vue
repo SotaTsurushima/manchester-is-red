@@ -58,7 +58,6 @@ const refreshNews = async () => {
   try {
     const response = await api.get('/transfers')
     transfers.value = response.data.data
-    console.log(transfers.value)
   } catch (err) {
     error.value = 'Failed to load news'
     console.error('Error fetching news:', err)
