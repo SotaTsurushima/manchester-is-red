@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- {{ players }} -->
     <div
       v-for="player in players"
       :key="player.name"
