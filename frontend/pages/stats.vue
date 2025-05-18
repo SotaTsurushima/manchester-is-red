@@ -16,7 +16,7 @@
         </button>
       </div>
       <LoadingSpinner v-if="loading" />
-      <StatsTable :players="players" :stat-label="statLabel" :stat-key="statKey" />
+      <StatsTable :players="topPlayers" :stat-label="statLabel" :stat-key="statKey" />
     </div>
   </Background>
 </template>
@@ -34,8 +34,14 @@ const activeTab = ref('Goals')
 const loading = ref(true)
 const players = ref([])
 
-const statLabel = computed(() => activeTab.value)
+const statLabel = computed(() => (activeTab.value === 'Goals' ? 'ゴール数' : 'アシスト数'))
 const statKey = computed(() => (activeTab.value === 'Goals' ? 'goals' : 'assists'))
+
+const topPlayers = computed(() => {
+  return [...players.value]
+    .sort((a, b) => (b[statKey.value] || 0) - (a[statKey.value] || 0))
+    .slice(0, 5)
+})
 
 const api = useApi()
 

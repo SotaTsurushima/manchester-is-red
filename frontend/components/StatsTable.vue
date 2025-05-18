@@ -1,5 +1,10 @@
 <template>
   <div>
+    <div class="flex items-center px-4 py-2 border-b border-gray-700 text-gray-300 font-semibold">
+      <span class="w-9"></span>
+      <span class="flex-1"></span>
+      <span>{{ statLabel }}</span>
+    </div>
     <div
       v-for="player in players"
       :key="player.name"
@@ -9,12 +14,17 @@
       <div class="flex-1">
         <div class="font-medium text-white">{{ player.name }}</div>
       </div>
+      <div class="text-white font-bold w-12 text-right">
+        {{ player[statKey] ?? 0 }}
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 defineProps({
-  players: Array
+  players: Array,
+  statLabel: String,
+  statKey: String
 })
 </script>
