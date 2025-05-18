@@ -16,13 +16,21 @@
         </button>
       </div>
       <LoadingSpinner v-if="loading" />
-      <StatsTable :players="topPlayers" :stat-label="statLabel" :stat-key="statKey" />
+      <StatsTable :players="displayPlayers" :stat-label="statLabel" :stat-key="statKey" />
+      <div v-if="!showAll && players.length > 5" class="flex justify-center mt-4">
+        <button
+          @click="showAll = true"
+          class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
+        >
+          Show More
+        </button>
+      </div>
     </div>
   </Background>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useApi } from '~/composables/api'
 import Background from '~/components/Background.vue'
 import Title from '~/components/Title.vue'
@@ -33,14 +41,17 @@ const tabs = ['Goals', 'Assists']
 const activeTab = ref('Goals')
 const loading = ref(true)
 const players = ref([])
+const showAll = ref(false)
 
 const statLabel = computed(() => (activeTab.value === 'Goals' ? 'Goals' : 'Assists'))
 const statKey = computed(() => (activeTab.value === 'Goals' ? 'goals' : 'assists'))
 
-const topPlayers = computed(() => {
-  return [...players.value]
-    .sort((a, b) => (b[statKey.value] || 0) - (a[statKey.value] || 0))
-    .slice(0, 5)
+const sortedPlayers = computed(() => {
+  return [...players.value].sort((a, b) => (b[statKey.value] || 0) - (a[statKey.value] || 0))
+})
+
+const displayPlayers = computed(() => {
+  return showAll.value ? sortedPlayers.value : sortedPlayers.value.slice(0, 5)
 })
 
 const api = useApi()
