@@ -34,7 +34,7 @@ const activeTab = ref('Goals')
 const loading = ref(true)
 const players = ref([])
 
-const statLabel = computed(() => (activeTab.value === 'Goals' ? 'ゴール数' : 'アシスト数'))
+const statLabel = computed(() => (activeTab.value === 'Goals' ? 'Goals' : 'Assists'))
 const statKey = computed(() => (activeTab.value === 'Goals' ? 'goals' : 'assists'))
 
 const topPlayers = computed(() => {
