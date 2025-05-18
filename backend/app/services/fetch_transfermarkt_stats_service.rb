@@ -1,4 +1,5 @@
 require 'selenium-webdriver'
+require 'nokogiri'
 
 class FetchTransfermarktStatsService
   def initialize(driver: nil, logger: Rails.logger)
@@ -8,14 +9,18 @@ class FetchTransfermarktStatsService
   end
 
   def call
-    fetch_player_links.each do |player_info|
-      begin
-        db_player = find_db_player_by_url(player_info[:url])
-        next unless db_player
-        update_player_stats(player_info, db_player)
-      rescue => e
-        @logger.warn "Error for #{player_info[:name]}: #{e.class} #{e.message}"
+    players = fetch_player_links
+    puts players
+    players.each do |player_info|
+      db_player = find_db_player_by_url(player_info[:url])
+      unless db_player
+        # urlからslugを抜き出して名前に変換
+        slug = extract_slug_from_url(player_info[:url])
+        name = slug_to_name(slug)
+        puts "DBに見つからない選手: #{name} (slug: #{slug})"
+        next
       end
+      update_player_stats(player_info, db_player)
     end
   ensure
     @driver.quit if @should_quit_driver
@@ -43,10 +48,14 @@ class FetchTransfermarktStatsService
     handle_cookie_banner
     @driver.find_elements(css: 'table.items > tbody > tr').map do |row|
       begin
-        link = row.find_element(css: 'td:nth-child(2) a')
+        td = row.find_element(css: 'td.hauptlink')
+        link = td.find_element(css: 'a')
         url = link.attribute('href')
-        next unless url && !url.empty?
-        { name: link.text.strip, url: url.start_with?('http') ? url : "https://www.transfermarkt.com#{url}" }
+        # NokogiriでinnerHTMLからテキストだけ抽出
+        raw_html = link.attribute('innerHTML')
+        name = Nokogiri::HTML.fragment(raw_html).text.strip
+        next unless url && url.include?('/spieler/')
+        { name: name, url: url.start_with?('http') ? url : "https://www.transfermarkt.com#{url}" }
       rescue
         nil
       end
@@ -70,13 +79,21 @@ class FetchTransfermarktStatsService
     @driver.navigate.to player_info[:url]
     sleep 2
     handle_cookie_banner
-    activate_premier_league_tab rescue nil
+
+    # Premier Leagueタブがなければスキップ
+    pl_tab_found = activate_premier_league_tab rescue false
+    unless pl_tab_found
+      @logger.warn "Premier Leagueタブが見つかりません: #{db_player.name}"
+      db_player.update(goals: 0, assists: 0)
+      return
+    end
+
     goals, assists = fetch_goals_and_assists
     db_player.update(
       goals: goals.to_s.strip.empty? ? 0 : goals.to_i,
       assists: assists.to_s.strip.empty? ? 0 : assists.to_i
     )
-    @logger.info "Updated: #{db_player.name}"
+    puts "Updated: #{db_player.name}"
   end
 
   def handle_cookie_banner
@@ -90,13 +107,14 @@ class FetchTransfermarktStatsService
       img = div.find_element(css: 'img') rescue nil
       img&.attribute('title') == "Premier League"
     end
-    return unless pl_div
+    return false unless pl_div
     unless pl_div.attribute('class').include?('tm-player-performance__thumb--active')
       @driver.execute_script("arguments[0].scrollIntoView(true);", pl_div)
       sleep 1
       pl_div.click
       sleep 2
     end
+    true
   end
 
   def fetch_goals_and_assists
@@ -104,6 +122,7 @@ class FetchTransfermarktStatsService
       a_tag = item.find_element(css: 'a.tm-player-performance__stats-list-item-value') rescue nil
       a_tag&.attribute('innerHTML')&.strip
     end.compact
+    
     [stats[1], stats[2]]
   end
 end 
