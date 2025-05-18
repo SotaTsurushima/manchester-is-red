@@ -5,7 +5,6 @@ class FetchTransfermarktStatsService
   def initialize(driver: nil, logger: Rails.logger)
     @driver = driver || setup_driver
     @should_quit_driver = driver.nil?
-    @logger = logger
   end
 
   def call
@@ -76,14 +75,20 @@ class FetchTransfermarktStatsService
   end
 
   def update_player_stats(player_info, db_player)
+    # GKなら即0で更新してreturn
+    if db_player.position == "GK"
+      db_player.update(goals: 0, assists: 0)
+      puts "Updated (GK): #{db_player.name}"
+      return
+    end
+
     @driver.navigate.to player_info[:url]
     sleep 2
     handle_cookie_banner
 
-    # Premier Leagueタブがなければスキップ
     pl_tab_found = activate_premier_league_tab rescue false
     unless pl_tab_found
-      @logger.warn "Premier Leagueタブが見つかりません: #{db_player.name}"
+      puts "Premier Leagueタブが見つかりません: #{db_player.name}"
       db_player.update(goals: 0, assists: 0)
       return
     end
