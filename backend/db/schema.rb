@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_17_144113) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_19_143259) do
   create_table "players", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.integer "number"
@@ -20,5 +20,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_17_144113) do
     t.string "position"
     t.integer "goals"
     t.integer "assists"
+    t.integer "yellow_card"
+    t.integer "red_card"
+    t.integer "appearances"
+    t.decimal "market_value", precision: 10
   end
 end
