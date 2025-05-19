@@ -15,7 +15,7 @@ COPY backend/Gemfile backend/Gemfile.lock ./
 
 # ✅ 本番用Gemのみインストール
 ENV RAILS_ENV=production
-RUN bundle install --without development test
+RUN bundle install -j 4 --without development test
 
 # =======================
 # 本番ステージ

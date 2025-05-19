@@ -12,7 +12,7 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/*
 
 COPY Gemfile* ./
-RUN bundle install
+RUN bundle install -j 4
 
 FROM ruby:3.2.2
 WORKDIR /app

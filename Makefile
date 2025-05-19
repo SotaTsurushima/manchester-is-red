@@ -37,7 +37,7 @@ db:
 at:
 	docker attach backend
 bundle:
-	docker compose run backend bundle install
+	docker compose run backend bundle install -j 4
 rubocop:
 	docker compose exec backend bundle exec rubocop -A
 cleanup:
