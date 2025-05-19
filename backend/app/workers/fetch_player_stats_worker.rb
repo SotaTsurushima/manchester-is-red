@@ -5,12 +5,6 @@ class FetchPlayerStatsWorker
 
   def perform
     stats = FbrefStatsService.new.fetch_player_stats
-    if stats.present?
-      Player.update_all(stats)
-    else
-      # エラー通知
-      NotificationService.notify_admin("Failed to fetch player stats")
-    end
   rescue => e
     Rails.logger.error "Error fetching player stats: #{e.message}"
     raise e  # Sidekiqのリトライ機能を利用
