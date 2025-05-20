@@ -15,7 +15,7 @@
         <div class="font-medium text-white">{{ player.name }}</div>
       </div>
       <div class="text-white font-bold w-12 text-right">
-        {{ player[statKey] ?? 0 }}
+        {{ formatValue(player[statKey]) }}
       </div>
     </div>
   </div>
@@ -25,6 +25,10 @@
 defineProps({
   players: Array,
   statLabel: String,
-  statKey: String
+  statKey: String,
+  formatValue: {
+    type: Function,
+    default: value => value ?? 0
+  }
 })
 </script>

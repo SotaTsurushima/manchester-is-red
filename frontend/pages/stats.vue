@@ -2,21 +2,26 @@
   <Background>
     <div class="max-w-2xl mx-auto p-6">
       <Title title="Stats" />
-      <div class="flex border-b border-gray-700 mb-2">
+      <div class="flex border-b border-gray-700 mb-2 overflow-x-auto">
         <button
           v-for="tab in tabs"
-          :key="tab"
-          @click="activeTab = tab"
+          :key="tab.value"
+          @click="activeTab = tab.value"
           :class="[
-            'px-4 py-2 text-sm font-medium focus:outline-none',
-            activeTab === tab ? 'border-b-2 border-white text-white' : 'text-gray-400'
+            'px-4 py-2 text-sm font-medium focus:outline-none whitespace-nowrap',
+            activeTab === tab.value ? 'border-b-2 border-white text-white' : 'text-gray-400'
           ]"
         >
-          {{ tab }}
+          {{ tab.label }}
         </button>
       </div>
       <LoadingSpinner v-if="loading" />
-      <StatsTable :players="displayPlayers" :stat-label="statLabel" :stat-key="statKey" />
+      <StatsTable
+        :players="displayPlayers"
+        :stat-label="statLabel"
+        :stat-key="statKey"
+        :format-value="formatValue"
+      />
       <div v-if="!showAll && players.length > 5" class="flex justify-center mt-4">
         <button
           @click="showAll = true"
@@ -37,17 +42,40 @@ import Title from '~/components/Title.vue'
 import LoadingSpinner from '~/components/LoadingSpinner.vue'
 import StatsTable from '~/components/StatsTable.vue'
 
-const tabs = ['Goals', 'Assists']
-const activeTab = ref('Goals')
+const tabs = [
+  { label: 'Goals', value: 'goals' },
+  { label: 'Assists', value: 'assists' },
+  { label: 'Yellow Cards', value: 'yellow_card' },
+  { label: 'Red Cards', value: 'red_card' },
+  { label: 'Appearances', value: 'appearances' },
+  { label: 'Market Value', value: 'market_value' }
+]
+
+const activeTab = ref('goals')
 const loading = ref(true)
 const players = ref([])
 const showAll = ref(false)
 
-const statLabel = computed(() => (activeTab.value === 'Goals' ? 'Goals' : 'Assists'))
-const statKey = computed(() => (activeTab.value === 'Goals' ? 'goals' : 'assists'))
+const statLabel = computed(() => {
+  const tab = tabs.find(t => t.value === activeTab.value)
+  return tab ? tab.label : ''
+})
+
+const statKey = computed(() => activeTab.value)
+
+const formatValue = computed(() => {
+  if (activeTab.value === 'market_value') {
+    return value => `€${value}M`
+  }
+  return value => value ?? 0
+})
 
 const sortedPlayers = computed(() => {
-  return [...players.value].sort((a, b) => (b[statKey.value] || 0) - (a[statKey.value] || 0))
+  return [...players.value].sort((a, b) => {
+    const aValue = a[statKey.value] || 0
+    const bValue = b[statKey.value] || 0
+    return bValue - aValue
+  })
 })
 
 const displayPlayers = computed(() => {
