@@ -19,83 +19,53 @@ class FbrefStatsService
     assists: 'assists',
     yellow_card: 'cards_yellow',
     red_card: 'cards_red'
-  }.freeze
+  }.freeze  
 
-  BATCH_SIZE = 5  # 一度に処理するプレイヤー数
-  BATCH_WAIT_TIME = 30  # バッチ間の待機時間（秒）
+  BATCH_SIZE = 5
+  BATCH_WAIT_TIME = 30
   
   def fetch_player_stats
     handle_response do
-      fetch_from_fbref
+      doc = fetch_with_retry(FBREF_URL)
+      rows = doc.css('table#stats_standard_9 tbody tr')
+      
+      rows.each_slice(BATCH_SIZE) do |batch_rows|
+        process_batch(batch_rows)
+        sleep(BATCH_WAIT_TIME)
+      end
     end
   end
 
   private
 
-  def fetch_from_fbref
-    doc = fetch_with_retry(FBREF_URL)
-    rows = doc.css('table#stats_standard_9 tbody tr')
-    
-    # バッチ処理の実装
-    rows.each_slice(BATCH_SIZE) do |batch_rows|
-      process_batch(batch_rows)
-      sleep(BATCH_WAIT_TIME)  # バッチ間で待機
-    end
-  end
-
   def process_batch(rows)
     rows.each do |row|
       next if row.css('th').empty?
 
-      fbref_name = row.css('th a').text.strip
-      player_link = row.css('th a').first['href']
+      name = row.css('th a').text.strip
+      link = row.css('th a').first['href']
+      player = find_player_by_partial_name(name)
       
-      process_player(fbref_name, player_link, row)
-    end
-  end
-
-  def process_player(fbref_name, player_link, row)
-    player = find_player_by_partial_name(fbref_name)
-    
-    if player
-      update_player_stats(player, row, player_link)
-    else
-      Rails.logger.info "Player not found: #{fbref_name}"
-    end
-  end
-
-  def update_player_stats(player, row, player_link)
-    new_stats = fetch_new_stats(row)
-    
-    if stats_changed?(player, new_stats)
-      market_value = fetch_market_value(player_link)
-      update_player(player, new_stats, market_value)
-    end
-  end
-
-  def update_player(player, new_stats, market_value)
-    if player.update(new_stats.merge(market_value: market_value))
-      Rails.logger.info "Updated stats for: #{player.name}"
-    else
-      Rails.logger.error "Failed to update #{player.name}: #{player.errors.full_messages.join(', ')}"
+      if player
+        new_stats = fetch_new_stats(row)
+        if stats_changed?(player, new_stats)
+          market_value = fetch_market_value(link)
+          player.update(new_stats.merge(market_value: market_value))
+        end
+      end
     end
   end
 
   def fetch_with_retry(url, max_retries = 3)
     retries = 0
     begin
-      # リクエスト間隔を5-10秒に増加
       sleep(rand(5..10))
-      
       response = URI.open(url, HEADERS)
       Nokogiri::HTML(response)
     rescue OpenURI::HTTPError => e
       if e.message.include?('429') && retries < max_retries
         retries += 1
-        # 待機時間をより長く設定（30分、1時間、2時間）
-        wait_time = 1800 * (2 ** (retries - 1))
-        Rails.logger.warn "Rate limit hit, waiting #{wait_time} seconds... (Attempt #{retries}/#{max_retries})"
-        sleep(wait_time)
+        sleep(1800 * (2 ** (retries - 1)))
         retry
       else
         raise "Failed to fetch data from #{url}: #{e.message}"
@@ -107,24 +77,17 @@ class FbrefStatsService
     return 0 unless player_url
 
     handle_response do
-      # 市場価値の取得をスキップする確率を設定（例：20%）
-      return 0 if rand < 0.2
-
       full_url = "https://fbref.com#{player_url}"
       player_doc = fetch_with_retry(full_url)
-      parse_market_value(player_doc)
-    end
-  end
-
-  def parse_market_value(doc)
-    market_value_text = doc.at_css('div#meta div:contains("Market Value")')&.text
-    
-    if market_value_text && market_value_text =~ /€(\d+\.?\d*)([km])?/
-      value = $1.to_f
-      value = $2 == 'k' ? value / 1000 : value
-      value.to_i
-    else
-      0
+      market_value_text = player_doc.at_css('div#meta div:contains("Market Value")')&.text
+      
+      if market_value_text && market_value_text =~ /€(\d+\.?\d*)([km])?/
+        value = $1.to_f
+        value = $2 == 'k' ? value / 1000 : value
+        value.to_i
+      else
+        0
+      end
     end
   end
 
