@@ -33,19 +33,12 @@ class FbrefStatsService
         next if row.css('th').empty?
 
         fbref_name = row.css('th a').text.strip
-        # 部分一致でプレイヤーを検索
+        
         player = find_player_by_partial_name(fbref_name)
         
         if player
-          # 更新前の値を出力
-          puts "Before update - Player: #{fbref_name} (matched with: #{player.name})"
-          puts "Current stats: #{format_current_stats(player)}"
-          
-          # 新しい統計情報を取得
           new_stats = fetch_new_stats(row)
-          puts "New stats: #{format_new_stats(new_stats)}"
           
-          # プレイヤーが存在する場合、統計情報を更新
           if player.update(new_stats.merge(market_value: 0))
             puts "Successfully updated stats for: #{player.name}"
           else
