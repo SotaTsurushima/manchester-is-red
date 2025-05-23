@@ -50,7 +50,8 @@ class FbrefStatsService
         new_stats = fetch_new_stats(row)
         if stats_changed?(player, new_stats)
           market_value = fetch_market_value(link)
-          player.update(new_stats.merge(market_value: market_value))
+          salary = fetch_salary(link)
+          player.update(new_stats.merge(market_value: market_value, salary: salary))
         end
       end
     end
@@ -73,6 +74,18 @@ class FbrefStatsService
     end
   end
 
+  def parse_currency_value(text, currency_symbol, multiplier = 1)
+    return 0 unless text
+
+    if (match = text.match(/#{currency_symbol}(\d+\.?\d*)([km])?/))
+      value = match[1].to_f
+      value = match[2] == 'k' ? value * multiplier : value
+      value.to_i
+    else
+      0
+    end
+  end
+
   def fetch_market_value(player_url)
     return 0 unless player_url
 
@@ -80,14 +93,18 @@ class FbrefStatsService
       full_url = "https://fbref.com#{player_url}"
       player_doc = fetch_with_retry(full_url)
       market_value_text = player_doc.at_css('div#meta div:contains("Market Value")')&.text
-      
-      if market_value_text && market_value_text =~ /€(\d+\.?\d*)([km])?/
-        value = $1.to_f
-        value = $2 == 'k' ? value / 1000 : value
-        value.to_i
-      else
-        0
-      end
+      parse_currency_value(market_value_text, '€', 0.001)
+    end
+  end
+
+  def fetch_salary(player_url)
+    return 0 unless player_url
+
+    handle_response do
+      full_url = "https://fbref.com#{player_url}"
+      player_doc = fetch_with_retry(full_url)
+      salary_text = player_doc.at_css('div#meta div:contains("Weekly Wage")')&.text
+      parse_currency_value(salary_text, '£', 1000)
     end
   end
 
