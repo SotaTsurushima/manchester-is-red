@@ -45,7 +45,6 @@ const navItems = [
   { href: '/transfers', text: 'Transfer' },
   { href: '/injury', text: 'Injury Report' },
   { href: '/stats', text: 'Stat Kings' },
-  // { href: '/value', text: 'Player Value' },
   // { href: '/mvp', text: 'MVP' },
 ]
 
