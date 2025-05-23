@@ -1,12 +1,13 @@
 class PlayersController < ApplicationController
+  before_action :set_player, only: [:show, :update, :destroy]
+
   def index
     players = Player.all
     render_success(players.as_json)
   end
 
   def show
-    player = Player.find(params[:id])
-    render_success(player.as_json(only: [:id, :name, :number, :position, :image]))
+    render_success(@player.as_json(only: [:id, :name, :number, :position, :image]))
   end
   
   def create
@@ -20,27 +21,28 @@ class PlayersController < ApplicationController
   end
 
   def update
-    player = Player.find(params[:id])
-
     url = if params[:file].present?
       Players::PlayerUploader.upload(params[:file])
     else
-      player.image
+      @player.image
     end
 
-    player.update!(player_params.merge(image: url)) # バリデーションエラー時はconcernでハンドリング
+    @player.update!(player_params.merge(image: url)) # バリデーションエラー時はconcernでハンドリング
 
-    render_success(player.as_json(only: [:id, :name, :number, :position, :image]))
+    render_success(@player.as_json(only: [:id, :name, :number, :position, :image]))
   end
 
   def destroy
-    player = Player.find(params[:id])
-    Players::PlayerUploader.delete(player.image) if player.image.present?
-    player.destroy!
-    render_success({ id: player.id })
+    Players::PlayerUploader.delete(@player.image) if @player.image.present?
+    @player.destroy!
+    render_success({ id: @player.id })
   end
 
   private
+
+  def set_player
+    @player = Player.find(params[:id])
+  end
 
   def player_params
     params.permit(:name, :number, :position)
