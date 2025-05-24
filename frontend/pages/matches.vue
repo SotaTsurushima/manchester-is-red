@@ -186,12 +186,17 @@ function awayGoals(match) {
 }
 
 const fetchMatches = async () => {
+  loading.value = true
   try {
+    await new Promise(r => setTimeout(r, 3000)) // 3秒ローディングを強制
     const data = await api.get('/matches')
-    matches.value = data.matches
+    console.log('API response:', data)
+    matches.value = Array.isArray(data.data?.matches) ? data.data.matches : []
+    console.log('🚀 ~ fetchMatches ~ matches.value:', matches.value)
   } catch (err) {
     error.value = 'Failed to load matches'
     console.error('Error fetching matches:', err)
+    matches.value = []
   } finally {
     loading.value = false
   }
