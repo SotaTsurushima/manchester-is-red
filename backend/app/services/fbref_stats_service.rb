@@ -59,7 +59,6 @@ class FbrefStatsService
     player = find_player_by_partial_name(name)
     
     return puts "Player not found in database: #{name}" unless player
-    # 更新可能かどうかを確認
     return puts "Player #{name} is not updatable" unless player.respond_to?(:update)
 
     update_player(player, row, link)
@@ -67,11 +66,9 @@ class FbrefStatsService
 
   def update_player(player, row, link)
     new_stats = fetch_new_stats(row)
-    market_value = fetch_player_info(link, 'Market Value', '€')
     salary = fetch_player_info(link, 'Wages', '[£￡]')
-    puts market_value
     
-    update_params = new_stats.merge(market_value: market_value, salary: salary)
+    update_params = new_stats.merge(salary: salary)
     
     if stats_changed?(player, update_params)
       update_player_record(player, update_params)
@@ -130,18 +127,12 @@ class FbrefStatsService
       
       # 部分一致のパターン
       patterns = [
-        # 完全一致
         normalized_db_name == normalized_fbref_name,
-        # 部分一致（どちらかがどちらかを包含）
         normalized_db_name.include?(normalized_fbref_name),
         normalized_fbref_name.include?(normalized_db_name),
-        # 姓のみの一致（最後の単語）
         normalized_db_name.split.last == normalized_fbref_name.split.last,
-        # 名のみの一致（最初の単語）
         normalized_db_name.split.first == normalized_fbref_name.split.first,
-        # スペースを除いた完全一致
         normalized_db_name.gsub(/\s+/, '') == normalized_fbref_name.gsub(/\s+/, ''),
-        # 部分一致（単語単位）
         normalized_db_name.split.any? { |word| normalized_fbref_name.include?(word) },
         normalized_fbref_name.split.any? { |word| normalized_db_name.include?(word) }
       ]
@@ -154,16 +145,16 @@ class FbrefStatsService
     return '' unless name
     
     name.downcase
-       .gsub(/\s+/, ' ')         # 複数のスペースを1つに
-       .strip                    # 前後のスペースを削除
-       .gsub(/[éèêë]/, 'e')     # é を e に変換
-       .gsub(/[áàâä]/, 'a')     # á を a に変換
-       .gsub(/[íìîï]/, 'i')     # í を i に変換
-       .gsub(/[óòôö]/, 'o')     # ó を o に変換
-       .gsub(/[úùûü]/, 'u')     # ú を u に変換
-       .gsub(/[ýỳŷÿ]/, 'y')     # ý を y に変換
-       .gsub(/[ñ]/, 'n')        # ñ を n に変換
-       .gsub(/[ç]/, 'c')        # ç を c に変換
+       .gsub(/\s+/, ' ')
+       .strip
+       .gsub(/[éèêë]/, 'e')
+       .gsub(/[áàâä]/, 'a')
+       .gsub(/[íìîï]/, 'i')
+       .gsub(/[óòôö]/, 'o')
+       .gsub(/[úùûü]/, 'u')
+       .gsub(/[ýỳŷÿ]/, 'y')
+       .gsub(/[ñ]/, 'n')
+       .gsub(/[ç]/, 'c')
   end
 
   def fetch_new_stats(row)
@@ -173,8 +164,6 @@ class FbrefStatsService
   end
 
   def stats_changed?(player, new_stats)
-    new_stats.any? do |key, value|
-      player.send(key) != value
-    end
+    new_stats.any? { |key, value| player.send(key) != value }
   end
 end
