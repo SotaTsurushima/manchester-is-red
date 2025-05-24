@@ -36,25 +36,36 @@ class FootballApiService
   end
 
   def fetch_matches(competitions)
-    response = self.class.get(
-      "/teams/#{TEAM_ID}/matches",
-      headers: @headers,
-      query: build_query(competitions)
-    )
-    
-    raise "API error: #{response.code} - #{response.message}" unless response.success?
-    raise "API rate limit exceeded" if response.code == 429
-
-    data = response.parsed_response
-    add_scorers_to_matches(data['matches']) if data['matches']
-    data
+    retries = 0
+    begin
+      response = self.class.get(
+        "/teams/#{TEAM_ID}/matches",
+        headers: @headers,
+        query: build_query(competitions)
+      )
+      if response.code == 429
+        raise "API rate limit exceeded"
+      end
+      raise "API error: #{response.code} - #{response.message}" unless response.success?
+      data = response.parsed_response
+      add_scorers_to_matches(data['matches']) if data['matches']
+      data
+    rescue => e
+      if response&.code == 429 && retries < 3
+        retries += 1
+        sleep(60) # 1分待機
+        retry
+      else
+        raise e
+      end
+    end
   end
 
   def build_query(competitions)
     {
       competitions: competitions,
       status: ['SCHEDULED', 'LIVE', 'IN_PLAY', 'PAUSED', 'FINISHED'].join(','),
-      limit: 100,
+      limit: 10,
       season: current_season
     }
   end
