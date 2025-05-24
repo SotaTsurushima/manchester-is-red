@@ -69,7 +69,17 @@ const formatValue = computed(() => {
     return value => `€${value}M`
   }
   if (activeTab.value === 'salary') {
-    return value => `£${value.toLocaleString()}`
+    return value => {
+      if (!value) return '£0'
+      // 週給を年収に変換して表示
+      const yearlySalary = value * 52
+      if (yearlySalary >= 1000000) {
+        return `£${(yearlySalary / 1000000).toFixed(1)}M`
+      } else if (yearlySalary >= 1000) {
+        return `£${(yearlySalary / 1000).toFixed(1)}K`
+      }
+      return `£${yearlySalary.toLocaleString()}`
+    }
   }
   return value => value ?? 0
 })
