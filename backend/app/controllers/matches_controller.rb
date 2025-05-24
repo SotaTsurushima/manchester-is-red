@@ -1,19 +1,7 @@
 class MatchesController < ApplicationController
   def index
-    matches_data = fetch_matches
-    render_success(format_response(matches_data))
-  end
-
-  private
-
-  def fetch_matches
-    FootballApiService.new.get_matches(params[:competition])
-  end
-
-  def format_response(matches_data)
-    {
-      matches: matches_data[:data]['matches'],
-      competition: params[:competition]
-    }
+    competition_id = params[:competition_id] || 'PL'
+    matches = MatchesService.get_matches(competition_id)
+    render json: { matches: matches }
   end
 end
