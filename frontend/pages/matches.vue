@@ -111,6 +111,7 @@ import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
 import Title from '../components/Title.vue'
 import Background from '../components/Background.vue'
+import { useCache } from '../composables/useCache'
 
 const api = useApi()
 const matches = ref([])
@@ -125,6 +126,8 @@ const competitions = [
   // { id: 'EFL', name: 'League Cup' }
   // { id: 'UEL', name: 'Europe League' }
 ]
+
+const cache = useCache()
 
 const sortedMatches = computed(() => {
   const now = new Date()
@@ -190,9 +193,30 @@ function awayGoals(match) {
 const fetchMatches = async () => {
   loading.value = true
   try {
-    await new Promise(r => setTimeout(r, 3000)) // 3秒ローディングを強制
-    const data = await api.get('/matches')
-    matches.value = Array.isArray(data.data?.matches) ? data.data.matches : []
+    const cacheKey = `matches-${selectedCompetition.value}`
+
+    const cachedData = cache.get(cacheKey)
+    if (cachedData) {
+      matches.value = cachedData.matches
+      loading.value = false
+      return
+    }
+
+    // APIから取得
+    const response = await api.get('/matches', {
+      params: { competition_id: selectedCompetition.value }
+    })
+    let matchesData
+    if (response?.data?.matches) {
+      matchesData = response.data.matches
+    } else if (response?.matches) {
+      matchesData = response.matches
+    } else {
+      throw new Error('API response does not contain matches')
+    }
+
+    matches.value = matchesData.matches
+    cache.set(cacheKey, matchesData)
   } catch (err) {
     error.value = 'Failed to load matches'
     console.error('Error fetching matches:', err)
