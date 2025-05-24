@@ -12,7 +12,7 @@ class MatchesController < ApplicationController
 
   def format_response(matches_data)
     {
-      matches: matches_data['matches'],
+      matches: matches_data[:data]['matches'],
       competition: params[:competition]
     }
   end
