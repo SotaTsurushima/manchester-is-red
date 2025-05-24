@@ -2,7 +2,7 @@
   <Background>
     <div class="max-w-2xl mx-auto p-6">
       <Title title="Stats" />
-      <div class="flex border-b border-gray-700 mb-2 overflow-x-auto">
+      <div class="flex border-b border-gray-700 mb-2">
         <button
           v-for="tab in tabs"
           :key="tab.value"
@@ -45,10 +45,11 @@ import StatsTable from '~/components/StatsTable.vue'
 const tabs = [
   { label: 'Goals', value: 'goals' },
   { label: 'Assists', value: 'assists' },
-  { label: 'Yellow Cards', value: 'yellow_card' },
-  { label: 'Red Cards', value: 'red_card' },
+  { label: 'Yellow Card', value: 'yellow_card' },
+  { label: 'Red Card', value: 'red_card' },
   { label: 'Appearances', value: 'appearances' },
-  { label: 'Market Value', value: 'market_value' }
+  { label: 'Market Value', value: 'market_value' },
+  { label: 'Salary', value: 'salary' }
 ]
 
 const activeTab = ref('goals')
@@ -66,6 +67,9 @@ const statKey = computed(() => activeTab.value)
 const formatValue = computed(() => {
   if (activeTab.value === 'market_value') {
     return value => `€${value}M`
+  }
+  if (activeTab.value === 'salary') {
+    return value => `£${value.toLocaleString()}`
   }
   return value => value ?? 0
 })
