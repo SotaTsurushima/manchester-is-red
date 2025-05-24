@@ -120,28 +120,50 @@ class FbrefStatsService
   end
 
   def find_player_by_partial_name(fbref_name)
-    normalized_fbref_name = fbref_name.downcase.gsub(/\s+/, '')
+    normalized_fbref_name = normalize_name(fbref_name)
     
     Player.all.find do |player|
-      normalized_db_name = player.name.downcase.gsub(/\s+/, '')
+      normalized_db_name = normalize_name(player.name)
       
       # 完全一致
       return player if normalized_db_name == normalized_fbref_name
       
       # 部分一致のパターン
       patterns = [
+        # 完全一致
+        normalized_db_name == normalized_fbref_name,
+        # 部分一致（どちらかがどちらかを包含）
         normalized_db_name.include?(normalized_fbref_name),
         normalized_fbref_name.include?(normalized_db_name),
-        # 姓のみの一致
+        # 姓のみの一致（最後の単語）
         normalized_db_name.split.last == normalized_fbref_name.split.last,
-        # 名のみの一致
+        # 名のみの一致（最初の単語）
         normalized_db_name.split.first == normalized_fbref_name.split.first,
         # スペースを除いた完全一致
-        normalized_db_name.gsub(/\s+/, '') == normalized_fbref_name.gsub(/\s+/, '')
+        normalized_db_name.gsub(/\s+/, '') == normalized_fbref_name.gsub(/\s+/, ''),
+        # 部分一致（単語単位）
+        normalized_db_name.split.any? { |word| normalized_fbref_name.include?(word) },
+        normalized_fbref_name.split.any? { |word| normalized_db_name.include?(word) }
       ]
       
       patterns.any?
     end
+  end
+
+  def normalize_name(name)
+    return '' unless name
+    
+    name.downcase
+       .gsub(/\s+/, ' ')         # 複数のスペースを1つに
+       .strip                    # 前後のスペースを削除
+       .gsub(/[éèêë]/, 'e')     # é を e に変換
+       .gsub(/[áàâä]/, 'a')     # á を a に変換
+       .gsub(/[íìîï]/, 'i')     # í を i に変換
+       .gsub(/[óòôö]/, 'o')     # ó を o に変換
+       .gsub(/[úùûü]/, 'u')     # ú を u に変換
+       .gsub(/[ýỳŷÿ]/, 'y')     # ý を y に変換
+       .gsub(/[ñ]/, 'n')        # ñ を n に変換
+       .gsub(/[ç]/, 'c')        # ç を c に変換
   end
 
   def fetch_new_stats(row)
