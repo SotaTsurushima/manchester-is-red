@@ -1,6 +1,7 @@
 # app/services/fbref_stats_service.rb
 require 'nokogiri'
 require 'open-uri'
+require 'set'
 
 class FbrefStatsService
   include ServiceHandler
@@ -26,7 +27,6 @@ class FbrefStatsService
   BATCH_WAIT_TIME = 30
   
   def fetch_player_stats
-    puts "Starting to fetch player stats..."
     rows = fetch_player_rows
     process_rows(rows)
   end
@@ -39,50 +39,41 @@ class FbrefStatsService
   end
 
   def process_rows(rows)
-    puts "Found #{rows.length} players to process"
+    updated_players = Set.new
     rows.each_slice(BATCH_SIZE) do |batch_rows|
-      puts "Processing batch of #{batch_rows.length} players"
-      process_batch(batch_rows)
+      process_batch(batch_rows, updated_players)
       sleep(BATCH_WAIT_TIME)
     end
   end
 
-  def process_batch(rows)
-    rows.each { |row| process_player(row) }
+  def process_batch(rows, updated_players)
+    rows.each { |row| process_player(row, updated_players) }
   end
 
-  def process_player(row)
+  def process_player(row, updated_players)
     return if row.css('th').empty?
-
     name = row.css('th a').text.strip
+    normalized_name = normalize_name(name)
+    return if updated_players.include?(normalized_name)
     link = row.css('th a').first['href']
     player = find_player_by_partial_name(name)
-    
-    return puts "Player not found in database: #{name}" unless player
-    return puts "Player #{name} is not updatable" unless player.respond_to?(:update)
-
+    return unless player
+    return unless player.respond_to?(:update)
     update_player(player, row, link)
+    updated_players << normalized_name
   end
 
   def update_player(player, row, link)
     new_stats = fetch_new_stats(row)
     salary = fetch_player_info(link, 'Wages', '[£￡]')
-    
     update_params = new_stats.merge(salary: salary)
-    
     if stats_changed?(player, update_params)
       update_player_record(player, update_params)
-    else
-      puts "No changes detected for player #{player.name}"
     end
   end
 
   def update_player_record(player, params)
-    if player.update(params)
-      puts "Successfully updated player #{player.name}"
-    else
-      puts "Failed to update player #{player.name}: #{player.errors.full_messages.join(', ')}"
-    end
+    player.update(params)
   end
 
   def fetch_with_retry(url, max_retries = 3)
@@ -127,34 +118,18 @@ class FbrefStatsService
       
       # 部分一致のパターン
       patterns = [
-        normalized_db_name == normalized_fbref_name,
         normalized_db_name.include?(normalized_fbref_name),
         normalized_fbref_name.include?(normalized_db_name),
+        # 姓のみの一致
         normalized_db_name.split.last == normalized_fbref_name.split.last,
+        # 名のみの一致
         normalized_db_name.split.first == normalized_fbref_name.split.first,
-        normalized_db_name.gsub(/\s+/, '') == normalized_fbref_name.gsub(/\s+/, ''),
-        normalized_db_name.split.any? { |word| normalized_fbref_name.include?(word) },
-        normalized_fbref_name.split.any? { |word| normalized_db_name.include?(word) }
+        # スペースを除いた完全一致
+        normalized_db_name.gsub(/\s+/, '') == normalized_fbref_name.gsub(/\s+/, '')
       ]
       
       patterns.any?
     end
-  end
-
-  def normalize_name(name)
-    return '' unless name
-    
-    name.downcase
-       .gsub(/\s+/, ' ')
-       .strip
-       .gsub(/[éèêë]/, 'e')
-       .gsub(/[áàâä]/, 'a')
-       .gsub(/[íìîï]/, 'i')
-       .gsub(/[óòôö]/, 'o')
-       .gsub(/[úùûü]/, 'u')
-       .gsub(/[ýỳŷÿ]/, 'y')
-       .gsub(/[ñ]/, 'n')
-       .gsub(/[ç]/, 'c')
   end
 
   def fetch_new_stats(row)
@@ -164,6 +139,23 @@ class FbrefStatsService
   end
 
   def stats_changed?(player, new_stats)
-    new_stats.any? { |key, value| player.send(key) != value }
+    new_stats.any? { |key, value| player.send(key).to_i != value.to_i }
+  end
+
+  private
+
+  def normalize_name(name)
+    return '' unless name
+    
+    name.downcase
+       .gsub(/\s+/, '')           # スペースを削除
+       .gsub(/[éèêë]/, 'e')      # é を e に変換
+       .gsub(/[áàâä]/, 'a')      # á を a に変換
+       .gsub(/[íìîï]/, 'i')      # í を i に変換
+       .gsub(/[óòôö]/, 'o')      # ó を o に変換
+       .gsub(/[úùûü]/, 'u')      # ú を u に変換
+       .gsub(/[ýỳŷÿ]/, 'y')      # ý を y に変換
+       .gsub(/[ñ]/, 'n')         # ñ を n に変換
+       .gsub(/[ç]/, 'c')         # ç を c に変換
   end
 end
