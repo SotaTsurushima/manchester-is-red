@@ -1,107 +1,109 @@
 <template>
-  <div class="matches mx-auto p-5 max-w-screen-lg bg-black">
-    <Title title="Manchester United Matches" />
+  <Background>
+    <div class="matches mx-auto p-5 max-w-screen-lg">
+      <Title title="Manchester United Matches" />
 
-    <!-- 大会選択トグル -->
-    <div class="flex justify-center space-x-4 mb-6">
-      <button
-        v-for="competition in competitions"
-        :key="competition.id"
-        @click="selectCompetition(competition.id)"
-        :class="[
-          'px-4 py-2 rounded-lg transition-all duration-200',
-          selectedCompetition === competition.id
-            ? 'bg-red-600 text-white'
-            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-        ]"
-      >
-        {{ competition.name }}
-        <span
-          v-if="competition.id === selectedCompetition"
-          class="ml-2 text-xs bg-white text-red-600 px-2 py-1 rounded-full"
+      <!-- 大会選択トグル -->
+      <div class="flex justify-center space-x-4 mb-6">
+        <button
+          v-for="competition in competitions"
+          :key="competition.id"
+          @click="selectCompetition(competition.id)"
+          :class="[
+            'px-4 py-2 rounded-lg transition-all duration-200',
+            selectedCompetition === competition.id
+              ? 'bg-red-600 text-white'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          ]"
         >
-          Active
-        </span>
-      </button>
-    </div>
-
-    <LoadingSpinner v-if="loading" message="Loading matches..." />
-    <ErrorMessage v-else-if="error" :message="error" />
-
-    <!-- 試合一覧 -->
-    <div v-else>
-      <div v-if="matches.length === 0" class="text-center text-xl text-gray-400">
-        No matches found for {{ getCompetitionName(selectedCompetition) }}.
+          {{ competition.name }}
+          <span
+            v-if="competition.id === selectedCompetition"
+            class="ml-2 text-xs bg-white text-red-600 px-2 py-1 rounded-full"
+          >
+            Active
+          </span>
+        </button>
       </div>
-      <div
-        v-for="match in sortedMatches"
-        :key="match.id"
-        class="text-center match-item p-5 mb-4 rounded-lg bg-gray-800 text-white shadow-lg hover:shadow-2xl transition-all duration-200"
-      >
-        <!-- 試合日時と主審 -->
-        <div class="text-center text-sm text-gray-400 mb-2 text-left">
-          <div>Date: {{ formatDate(match.utcDate) }}</div>
-          <div v-if="match.referees && match.referees.length > 0">
-            Referee: {{ match.referees[0].name }}
-          </div>
-          <div v-if="match.venue">Venue: {{ match.venue }}</div>
+
+      <LoadingSpinner v-if="loading" message="Loading matches..." />
+      <ErrorMessage v-else-if="error" :message="error" />
+
+      <!-- 試合一覧 -->
+      <div v-else>
+        <div v-if="matches.length === 0" class="text-center text-xl text-gray-400">
+          No matches found for {{ getCompetitionName(selectedCompetition) }}.
         </div>
-
-        <!-- チーム情報とスコア -->
-        <div class="flex justify-between items-center">
-          <!-- ホームチーム -->
-          <div class="flex items-center flex-1">
-            <img
-              v-if="match.homeTeam.crest"
-              :src="match.homeTeam.crest"
-              :alt="match.homeTeam.name"
-              class="w-8 h-8 mr-2"
-            />
-            <span class="text-xl font-semibold">{{ match.homeTeam.name }}</span>
-          </div>
-
-          <!-- スコア（中央） -->
-          <div class="flex-none px-4">
-            <div v-if="match.status === 'FINISHED'" class="text-2xl font-bold">
-              {{ match.score.fullTime.home }} - {{ match.score.fullTime.away }}
+        <div
+          v-for="match in sortedMatches"
+          :key="match.id"
+          class="text-center match-item p-5 mb-4 rounded-lg bg-gray-800 text-white shadow-lg hover:shadow-2xl transition-all duration-200"
+        >
+          <!-- 試合日時と主審 -->
+          <div class="text-center text-sm text-gray-400 mb-2 text-left">
+            <div>Date: {{ formatDate(match.utcDate) }}</div>
+            <div v-if="match.referees && match.referees.length > 0">
+              Referee: {{ match.referees[0].name }}
             </div>
-            <div v-else-if="match.status === 'IN_PLAY'" class="text-green-500">Live</div>
-            <div v-else class="text-yellow-500">
-              {{ formatTime(match.utcDate) }}
+            <div v-if="match.venue">Venue: {{ match.venue }}</div>
+          </div>
+
+          <!-- チーム情報とスコア -->
+          <div class="flex justify-between items-center">
+            <!-- ホームチーム -->
+            <div class="flex items-center flex-1">
+              <img
+                v-if="match.homeTeam.crest"
+                :src="match.homeTeam.crest"
+                :alt="match.homeTeam.name"
+                class="w-8 h-8 mr-2"
+              />
+              <span class="text-xl font-semibold">{{ match.homeTeam.name }}</span>
             </div>
-          </div>
 
-          <!-- アウェイチーム -->
-          <div class="flex items-center flex-1 justify-end">
-            <span class="text-xl font-semibold">{{ match.awayTeam.name }}</span>
-            <img
-              v-if="match.awayTeam.crest"
-              :src="match.awayTeam.crest"
-              :alt="match.awayTeam.name"
-              class="w-8 h-8 ml-2"
-            />
-          </div>
-        </div>
-
-        <!-- 試合詳細（得点者など） -->
-        <div v-if="match.goals && match.goals.length > 0" class="mt-4 text-sm">
-          <h4 class="font-semibold mb-2">Goals:</h4>
-          <div class="grid grid-cols-2 gap-2">
-            <div class="text-left">
-              <div v-for="goal in homeGoals(match)" :key="goal.minute" class="text-gray-300">
-                ⚽ {{ goal.minute }}' {{ goal.scorer }}
+            <!-- スコア（中央） -->
+            <div class="flex-none px-4">
+              <div v-if="match.status === 'FINISHED'" class="text-2xl font-bold">
+                {{ match.score.fullTime.home }} - {{ match.score.fullTime.away }}
+              </div>
+              <div v-else-if="match.status === 'IN_PLAY'" class="text-green-500">Live</div>
+              <div v-else class="text-yellow-500">
+                {{ formatTime(match.utcDate) }}
               </div>
             </div>
-            <div class="text-right">
-              <div v-for="goal in awayGoals(match)" :key="goal.minute" class="text-gray-300">
-                {{ goal.scorer }} {{ goal.minute }}' ⚽
+
+            <!-- アウェイチーム -->
+            <div class="flex items-center flex-1 justify-end">
+              <span class="text-xl font-semibold">{{ match.awayTeam.name }}</span>
+              <img
+                v-if="match.awayTeam.crest"
+                :src="match.awayTeam.crest"
+                :alt="match.awayTeam.name"
+                class="w-8 h-8 ml-2"
+              />
+            </div>
+          </div>
+
+          <!-- 試合詳細（得点者など） -->
+          <div v-if="match.goals && match.goals.length > 0" class="mt-4 text-sm">
+            <h4 class="font-semibold mb-2">Goals:</h4>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="text-left">
+                <div v-for="goal in homeGoals(match)" :key="goal.minute" class="text-gray-300">
+                  ⚽ {{ goal.minute }}' {{ goal.scorer }}
+                </div>
+              </div>
+              <div class="text-right">
+                <div v-for="goal in awayGoals(match)" :key="goal.minute" class="text-gray-300">
+                  {{ goal.scorer }} {{ goal.minute }}' ⚽
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </Background>
 </template>
 
 <script setup>
@@ -110,6 +112,7 @@ import { useApi } from '../composables/api'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
 import Title from '../components/Title.vue'
+import Background from '../components/Background.vue'
 
 const api = useApi()
 const matches = ref([])
@@ -190,7 +193,6 @@ const fetchMatches = async () => {
   try {
     await new Promise(r => setTimeout(r, 3000)) // 3秒ローディングを強制
     const data = await api.get('/matches')
-    console.log('API response:', data)
     matches.value = Array.isArray(data.data?.matches) ? data.data.matches : []
     console.log('🚀 ~ fetchMatches ~ matches.value:', matches.value)
   } catch (err) {
