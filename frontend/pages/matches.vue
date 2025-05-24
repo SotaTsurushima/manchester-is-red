@@ -2,8 +2,6 @@
   <Background>
     <div class="matches mx-auto p-5 max-w-screen-lg">
       <Title title="Manchester United Matches" />
-
-      <!-- 大会選択トグル -->
       <div class="flex justify-center space-x-4 mb-6">
         <button
           v-for="competition in competitions"
@@ -160,9 +158,9 @@ function getCompetitionName(id) {
   return competition ? competition.name : ''
 }
 
-// 日付フォーマット
+// Date formatting
 function formatDate(utcDate) {
-  return new Date(utcDate).toLocaleDateString('ja-JP', {
+  return new Date(utcDate).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -170,11 +168,12 @@ function formatDate(utcDate) {
   })
 }
 
-// 時刻フォーマット
+// Time formatting
 function formatTime(utcDate) {
-  return new Date(utcDate).toLocaleTimeString('ja-JP', {
+  return new Date(utcDate).toLocaleTimeString('en-US', {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    hour12: true // 12時間形式（AM/PM）を使用
   })
 }
 
