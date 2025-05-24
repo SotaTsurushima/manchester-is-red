@@ -1,8 +1,10 @@
 require 'nokogiri'
 require 'open-uri'
+require_relative 'name_normalizer'
 
 class TransfermarktStatsService
   include ServiceHandler
+  include NameNormalizer
 
   TRANSFERMARKT_URL = 'https://www.transfermarkt.com/manchester-united/startseite/verein/985'
   HEADERS = {
@@ -19,7 +21,7 @@ class TransfermarktStatsService
     parse_market_value(value_text)
   end
 
-  def fetch_market_values_and_update_db
+  def fetch_market_values
     doc = fetch_with_retry(TRANSFERMARKT_URL, 2)
     players = {}
     doc.css('table.items tbody tr').each do |row|
@@ -81,20 +83,5 @@ class TransfermarktStatsService
     else
       nil
     end
-  end
-
-  def normalize_name(name)
-    return '' unless name
-    name.downcase
-        .gsub(/\s+/, ' ')
-        .strip
-        .gsub(/[éèêë]/, 'e')
-        .gsub(/[áàâä]/, 'a')
-        .gsub(/[íìîï]/, 'i')
-        .gsub(/[óòôö]/, 'o')
-        .gsub(/[úùûü]/, 'u')
-        .gsub(/[ýỳŷÿ]/, 'y')
-        .gsub(/[ñ]/, 'n')
-        .gsub(/[ç]/, 'c')
   end
 end

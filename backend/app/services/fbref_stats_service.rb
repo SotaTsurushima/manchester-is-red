@@ -2,9 +2,11 @@
 require 'nokogiri'
 require 'open-uri'
 require 'set'
+require_relative 'name_normalizer'
 
 class FbrefStatsService
   include ServiceHandler
+  include NameNormalizer
 
   FBREF_URL = 'https://fbref.com/en/squads/19538871/Manchester-United-Stats'
   HEADERS = {
@@ -140,22 +142,5 @@ class FbrefStatsService
 
   def stats_changed?(player, new_stats)
     new_stats.any? { |key, value| player.send(key).to_i != value.to_i }
-  end
-
-  private
-
-  def normalize_name(name)
-    return '' unless name
-    
-    name.downcase
-       .gsub(/\s+/, '')           # スペースを削除
-       .gsub(/[éèêë]/, 'e')      # é を e に変換
-       .gsub(/[áàâä]/, 'a')      # á を a に変換
-       .gsub(/[íìîï]/, 'i')      # í を i に変換
-       .gsub(/[óòôö]/, 'o')      # ó を o に変換
-       .gsub(/[úùûü]/, 'u')      # ú を u に変換
-       .gsub(/[ýỳŷÿ]/, 'y')      # ý を y に変換
-       .gsub(/[ñ]/, 'n')         # ñ を n に変換
-       .gsub(/[ç]/, 'c')         # ç を c に変換
   end
 end
