@@ -18,42 +18,73 @@ class FbrefStatsService
     goals: 'goals',
     assists: 'assists',
     yellow_card: 'cards_yellow',
-    red_card: 'cards_red'
+    red_card: 'cards_red',
+    mvp: 'player_of_match'
   }.freeze  
 
   BATCH_SIZE = 5
   BATCH_WAIT_TIME = 30
   
   def fetch_player_stats
-    handle_response do
-      doc = fetch_with_retry(FBREF_URL)
-      rows = doc.css('table#stats_standard_9 tbody tr')
-      
-      rows.each_slice(BATCH_SIZE) do |batch_rows|
-        process_batch(batch_rows)
-        sleep(BATCH_WAIT_TIME)
-      end
-    end
+    puts "Starting to fetch player stats..."
+    rows = fetch_player_rows
+    process_rows(rows)
   end
 
   private
 
-  def process_batch(rows)
-    rows.each do |row|
-      next if row.css('th').empty?
+  def fetch_player_rows
+    doc = fetch_with_retry(FBREF_URL)
+    doc.css('table#stats_standard_9 tbody tr')
+  end
 
-      name = row.css('th a').text.strip
-      link = row.css('th a').first['href']
-      player = find_player_by_partial_name(name)
-      
-      if player
-        new_stats = fetch_new_stats(row)
-        if stats_changed?(player, new_stats)
-          market_value = fetch_market_value(link)
-          salary = fetch_salary(link)
-          player.update(new_stats.merge(market_value: market_value, salary: salary))
-        end
-      end
+  def process_rows(rows)
+    puts "Found #{rows.length} players to process"
+    rows.each_slice(BATCH_SIZE) do |batch_rows|
+      puts "Processing batch of #{batch_rows.length} players"
+      process_batch(batch_rows)
+      sleep(BATCH_WAIT_TIME)
+    end
+  end
+
+  def process_batch(rows)
+    rows.each { |row| process_player(row) }
+  end
+
+  def process_player(row)
+    return if row.css('th').empty?
+
+    name = row.css('th a').text.strip
+    link = row.css('th a').first['href']
+    player = find_player_by_partial_name(name)
+    
+    return puts "Player not found in database: #{name}" unless player
+    # 更新可能かどうかを確認
+    return puts "Player #{name} is not updatable" unless player.respond_to?(:update)
+
+    update_player(player, row, link)
+  end
+
+  def update_player(player, row, link)
+    new_stats = fetch_new_stats(row)
+    market_value = fetch_player_info(link, 'Market Value', '€')
+    salary = fetch_player_info(link, 'Wages', '[£￡]')
+    puts market_value
+    
+    update_params = new_stats.merge(market_value: market_value, salary: salary)
+    
+    if stats_changed?(player, update_params)
+      update_player_record(player, update_params)
+    else
+      puts "No changes detected for player #{player.name}"
+    end
+  end
+
+  def update_player_record(player, params)
+    if player.update(params)
+      puts "Successfully updated player #{player.name}"
+    else
+      puts "Failed to update player #{player.name}: #{player.errors.full_messages.join(', ')}"
     end
   end
 
@@ -74,37 +105,17 @@ class FbrefStatsService
     end
   end
 
-  def parse_currency_value(text, currency_symbol, multiplier = 1)
-    return 0 unless text
+  def fetch_player_info(player_url, selector, currency_pattern)
+    return 0 unless player_url
 
-    if (match = text.match(/#{currency_symbol}(\d+\.?\d*)([km])?/))
-      value = match[1].to_f
-      value = match[2] == 'k' ? value * multiplier : value
-      value.to_i
+    full_url = "https://fbref.com#{player_url}"
+    player_doc = fetch_with_retry(full_url)
+    text = player_doc.at_css("div#meta div:contains('#{selector}')")&.text&.strip
+    
+    if text && (match = text.match(/#{currency_pattern}\s*(\d+\.?\d*)/))
+      match[1].to_f.to_i
     else
       0
-    end
-  end
-
-  def fetch_market_value(player_url)
-    return 0 unless player_url
-
-    handle_response do
-      full_url = "https://fbref.com#{player_url}"
-      player_doc = fetch_with_retry(full_url)
-      market_value_text = player_doc.at_css('div#meta div:contains("Market Value")')&.text
-      parse_currency_value(market_value_text, '€', 0.001)
-    end
-  end
-
-  def fetch_salary(player_url)
-    return 0 unless player_url
-
-    handle_response do
-      full_url = "https://fbref.com#{player_url}"
-      player_doc = fetch_with_retry(full_url)
-      salary_text = player_doc.at_css('div#meta div:contains("Weekly Wage")')&.text
-      parse_currency_value(salary_text, '£', 1000)
     end
   end
 
@@ -113,8 +124,23 @@ class FbrefStatsService
     
     Player.all.find do |player|
       normalized_db_name = player.name.downcase.gsub(/\s+/, '')
-      normalized_db_name.include?(normalized_fbref_name) || 
-      normalized_fbref_name.include?(normalized_db_name)
+      
+      # 完全一致
+      return player if normalized_db_name == normalized_fbref_name
+      
+      # 部分一致のパターン
+      patterns = [
+        normalized_db_name.include?(normalized_fbref_name),
+        normalized_fbref_name.include?(normalized_db_name),
+        # 姓のみの一致
+        normalized_db_name.split.last == normalized_fbref_name.split.last,
+        # 名のみの一致
+        normalized_db_name.split.first == normalized_fbref_name.split.first,
+        # スペースを除いた完全一致
+        normalized_db_name.gsub(/\s+/, '') == normalized_fbref_name.gsub(/\s+/, '')
+      ]
+      
+      patterns.any?
     end
   end
 
@@ -125,8 +151,8 @@ class FbrefStatsService
   end
 
   def stats_changed?(player, new_stats)
-    STATS_MAPPING.keys.any? do |stat|
-      player.send(stat) != new_stats[stat]
+    new_stats.any? do |key, value|
+      player.send(key) != value
     end
   end
 end
