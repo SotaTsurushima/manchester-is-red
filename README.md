@@ -1,4 +1,6 @@
-<img src="https://img.shields.io/badge/-Vue.js-4FC08D.svg?logo=vue.js&style=plastic"><img src="https://img.shields.io/badge/-Nuxt.js-00C58E.svg?logo=nuxt.js&style=plastic"><img src="https://img.shields.io/badge/-Ruby-CC342D.svg?logo=ruby&style=plastic"><img src="https://img.shields.io/badge/-Rails-CC0000.svg?logo=rails&style=plastic"><img src="https://img.shields.io/badge/-Docker-1488C6.svg?logo=docker&style=plastic"><img src="https://img.shields.io/badge/-Mysql-4479A1.svg?logo=mysql&style=plastic"><img src="https://img.shields.io/badge/-Redis-D82C20.svg?logo=redis&style=plastic">
+![My Skills](https://skillicons.dev/icons?i=docker,ruby,rails,vue,nuxtjs,tailwind,vite,redis,github,mysql&perline=5)
+
+
 
 # Manchester United Match Tracker
 
