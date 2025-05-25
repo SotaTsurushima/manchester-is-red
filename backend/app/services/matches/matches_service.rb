@@ -4,7 +4,6 @@ module Matches
       'PL' => 'Premier League',
       'UEL' => 'Europa Lg',
       'FA' => 'FA Cup',
-      # ...他も同様
     }
 
     def self.get_matches(competition_id)
