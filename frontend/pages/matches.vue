@@ -39,7 +39,7 @@
         >
           <!-- 試合日時と主審 -->
           <div class="text-center text-sm text-gray-400 mb-2 text-left">
-            <div>Date: {{ formatDate(match.utcDate) }}</div>
+            <div>Date: {{ formatDate(match.utc_date) }}</div>
             <div v-if="match.referees && match.referees.length > 0">
               Referee: {{ match.referees[0].name }}
             </div>
@@ -50,35 +50,33 @@
           <div class="flex justify-between items-center">
             <!-- ホームチーム -->
             <div class="flex items-center flex-1">
-              <img
+              <!-- <img
                 v-if="match.homeTeam.crest"
                 :src="match.homeTeam.crest"
                 :alt="match.homeTeam.name"
                 class="w-8 h-8 mr-2"
-              />
-              <span class="text-xl font-semibold">{{ match.homeTeam.name }}</span>
+              /> -->
+              <span class="text-xl font-semibold">{{ match.home_team }}</span>
             </div>
 
-            <!-- スコア（中央） -->
             <div class="flex-none px-4">
-              <div v-if="match.status === 'FINISHED'" class="text-2xl font-bold">
-                {{ match.score.fullTime.home }} - {{ match.score.fullTime.away }}
+              <div v-if="match.score && match.score === ' - '" class="text-yellow-500">
+                {{ formatTime(match.utc_date) }}
               </div>
-              <div v-else-if="match.status === 'IN_PLAY'" class="text-green-500">Live</div>
-              <div v-else class="text-yellow-500">
-                {{ formatTime(match.utcDate) }}
+              <div v-else class="text-2xl font-bold">
+                {{ match.score }}
               </div>
             </div>
 
             <!-- アウェイチーム -->
             <div class="flex items-center flex-1 justify-end">
-              <span class="text-xl font-semibold">{{ match.awayTeam.name }}</span>
-              <img
+              <span class="text-xl font-semibold">{{ match.away_team }}</span>
+              <!-- <img
                 v-if="match.awayTeam.crest"
                 :src="match.awayTeam.crest"
                 :alt="match.awayTeam.name"
                 class="w-8 h-8 ml-2"
-              />
+              /> -->
             </div>
           </div>
 
@@ -117,14 +115,14 @@ const api = useApi()
 const matches = ref([])
 const loading = ref(true)
 const error = ref(null)
-const selectedCompetition = ref('PL')
+const selectedCompetition = ref('Premier League')
 
 const competitions = [
-  { id: 'PL', name: 'Premier League' },
-  { id: 'CL', name: 'Champions League' }
-  // { id: 'FA', name: 'FA Cup' },
-  // { id: 'EFL', name: 'League Cup' }
-  // { id: 'UEL', name: 'Europe League' }
+  { id: 'Premier League', name: 'Premier League' },
+  { id: 'Europa Lg', name: 'Europa League' },
+  { id: 'FA Cup', name: 'FA Cup' },
+  { id: 'EFL Cup', name: 'League Cup' }
+  // 必要に応じて他の大会も追加
 ]
 
 const cache = useCache()
@@ -133,8 +131,8 @@ const sortedMatches = computed(() => {
   const now = new Date()
 
   return [...matches.value].sort((a, b) => {
-    const dateA = new Date(a.utcDate)
-    const dateB = new Date(b.utcDate)
+    const dateA = new Date(a.utc_date)
+    const dateB = new Date(b.utc_date)
 
     // 未来の試合（これから行われる試合）
     const aIsFuture = dateA > now
@@ -162,8 +160,8 @@ function getCompetitionName(id) {
 }
 
 // Date formatting
-function formatDate(utcDate) {
-  return new Date(utcDate).toLocaleDateString('en-US', {
+function formatDate(utc_date) {
+  return new Date(utc_date).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -172,8 +170,8 @@ function formatDate(utcDate) {
 }
 
 // Time formatting
-function formatTime(utcDate) {
-  return new Date(utcDate).toLocaleTimeString('en-US', {
+function formatTime(utc_date) {
+  return new Date(utc_date).toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true // 12時間形式（AM/PM）を使用
