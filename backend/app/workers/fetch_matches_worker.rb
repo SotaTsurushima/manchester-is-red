@@ -4,7 +4,7 @@ class FetchMatchesWorker
 
   def perform
     begin
-      TransfermarktMatchesService.new.fetch_and_save_matches
+      Matches::TransfermarktMatchesService.new.fetch_and_save_matches
       Rails.logger.info 'Successfully fetched and saved matches from Transfermarkt.'
     rescue => e
       Rails.logger.error "Error fetching matches: #{e.message}"
