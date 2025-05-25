@@ -192,35 +192,27 @@ function awayGoals(match) {
 
 const fetchMatches = async () => {
   loading.value = true
-  try {
-    const cacheKey = `matches-${selectedCompetition.value}`
+  error.value = null
+  const cacheKey = `matches-${selectedCompetition.value}`
 
-    const cachedData = cache.get(cacheKey)
-    if (cachedData) {
-      matches.value = cachedData.matches
-      loading.value = false
+  try {
+    // キャッシュ優先
+    const cached = cache.get(cacheKey)
+    if (cached) {
+      matches.value = cached.matches
       return
     }
 
-    // APIから取得
     const response = await api.get('/matches', {
       params: { competition_id: selectedCompetition.value }
     })
-    let matchesData
-    if (response?.data?.matches) {
-      matchesData = response.data.matches
-    } else if (response?.matches) {
-      matchesData = response.matches
-    } else {
-      throw new Error('API response does not contain matches')
-    }
-
+    const matchesData = response.matches
     matches.value = matchesData.matches
     cache.set(cacheKey, matchesData)
   } catch (err) {
+    matches.value = []
     error.value = 'Failed to load matches'
     console.error('Error fetching matches:', err)
-    matches.value = []
   } finally {
     loading.value = false
   }
