@@ -26,6 +26,7 @@ gem 'rss'
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
 gem 'selenium-webdriver'
+gem 'kaminari'
 
 group :development do
   gem "pry"
