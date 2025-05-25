@@ -20,22 +20,32 @@ module Matches
         doc.css('table#matchlogs_for tbody tr').each do |row|
           date = row.at_css('th[data-stat="date"]')&.text&.strip
           time = row.at_css('td[data-stat="start_time"]')&.text&.strip
-          competition = row.at_css('td[data-stat="comp"] a')&.text&.strip
+          competition_name = row.at_css('td[data-stat="comp"] a')&.text&.strip
           round = row.at_css('td[data-stat="round"]')&.text&.strip
           day = row.at_css('td[data-stat="dayofweek"]')&.text&.strip
           venue = row.at_css('td[data-stat="venue"]')&.text&.strip
           result = row.at_css('td[data-stat="result"]')&.text&.strip
           goals_for = row.at_css('td[data-stat="goals_for"]')&.text&.strip
           goals_against = row.at_css('td[data-stat="goals_against"]')&.text&.strip
-          opponent = row.at_css('td[data-stat="opponent"] a')&.text&.strip
+          opponent_name = row.at_css('td[data-stat="opponent"] a')&.text&.strip
 
           # 必要な値が取得できているか確認
-          puts [date, time, competition, round, day, venue, result, goals_for, goals_against, opponent].join(' | ')
+          puts [date, time, competition_name, round, day, venue, result, goals_for, goals_against, opponent_name].join(' | ')
 
-          next unless date && opponent
+          next unless date && opponent_name
 
           # Home/Away判定
-          home_team, away_team = venue == 'Home' ? ['Manchester United', opponent] : [opponent, 'Manchester United']
+          if venue == 'Home'
+            home_team_name = 'Manchester United'
+            away_team_name = opponent_name
+          else
+            home_team_name = opponent_name
+            away_team_name = 'Manchester United'
+          end
+
+          # 4. teamsテーブルにデータを保存（find_or_create_byで重複防止）
+          home_team = Team.find_or_create_by!(name: home_team_name)
+          away_team = Team.find_or_create_by!(name: away_team_name)
 
           date_obj = begin
             DateTime.parse("#{date} #{time}")
@@ -43,13 +53,14 @@ module Matches
             nil
           end
 
-          next unless date_obj && opponent
+          next unless date_obj
 
+          # 5. matchesテーブルの保存時にteam_idを使う
           Match.find_or_initialize_by(
             utc_date: date_obj,
-            home_team: home_team,
-            away_team: away_team,
-            competition: competition
+            home_team_id: home_team.id,
+            away_team_id: away_team.id,
+            competition: competition_name
           ).tap do |m|
             m.score = "#{goals_for} - #{goals_against}"
             m.venue = venue
