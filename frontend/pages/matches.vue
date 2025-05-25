@@ -60,11 +60,11 @@
             </div>
 
             <div class="flex-none px-4">
-              <div v-if="match.score && match.score === ' - '" class="text-yellow-500">
-                {{ formatTime(match.utc_date) }}
-              </div>
-              <div v-else class="text-2xl font-bold">
+              <div v-if="match.status" class="text-2xl font-bold">
                 {{ match.score }}
+              </div>
+              <div v-else class="text-2xl font-bold text-yellow-500">
+                {{ formatTime(match.utc_date) }}
               </div>
             </div>
 
