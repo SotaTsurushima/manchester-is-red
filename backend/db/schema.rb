@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_25_061857) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_25_132939) do
   create_table "matches", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "utc_date"
     t.string "home_team"
@@ -39,5 +39,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_25_061857) do
     t.decimal "market_value", precision: 10
     t.integer "mvp"
     t.integer "salary"
+  end
+
+  create_table "teams", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.string "crest_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 end
