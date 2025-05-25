@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  utc_date: 2025-05-25 06:18:57
+  home_team: MyString
+  away_team: MyString
+  competition: MyString
+  score: MyString
+  venue: MyString
+  status: MyString
+  referees: MyString
+
+two:
+  utc_date: 2025-05-25 06:18:57
+  home_team: MyString
+  away_team: MyString
+  competition: MyString
+  score: MyString
+  venue: MyString
+  status: MyString
+  referees: MyString
