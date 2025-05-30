@@ -55,7 +55,7 @@
 
             <div class="flex-none px-4">
               <div v-if="match.status" class="text-2xl font-bold">
-                {{ match.score }}
+                {{ displayScore(match) }}
               </div>
               <div v-else class="text-2xl font-bold text-yellow-500">
                 {{ formatDateTime(match.utc_date, 'time') }}
@@ -153,18 +153,26 @@ function getGoals(match, team) {
   return match.goals?.filter(goal => goal.team === team) || []
 }
 
+function displayScore(match) {
+  if (!match.score) return ''
+  const [home, away] = match.score.split('-').map(s => s.trim())
+  if (match.away_team === 'Manchester United') {
+    return `${away} - ${home}`
+  }
+  return match.score
+}
+
 const fetchMatches = async () => {
   loading.value = true
   error.value = null
 
   try {
-    const response = await api.get('/matches', {
-      params: {
-        competition_id: selectedCompetition.value,
-        page: currentPage.value,
-        per_page: 10
-      }
+    const params = new URLSearchParams({
+      competition_id: selectedCompetition.value,
+      page: currentPage.value,
+      per_page: 10
     })
+    const response = await api.get(`/matches?${params.toString()}`)
     matches.value = response.matches?.matches || []
     total.value = response.matches?.total || 0
   } catch (err) {
