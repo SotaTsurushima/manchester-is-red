@@ -30,16 +30,16 @@
       <!-- 試合一覧 -->
       <div v-else>
         <div v-if="matches.length === 0" class="text-center text-xl text-gray-400">
-          No matches found for {{ getCompetitionName(selectedCompetition) }}.
+          No matches found for {{ selectedCompetition }}.
         </div>
         <div
-          v-for="match in sortedMatches"
+          v-for="match in matches"
           :key="match.id"
           class="text-center match-item p-5 mb-4 rounded-lg bg-gray-800 text-white shadow-lg hover:shadow-2xl transition-all duration-200"
         >
           <!-- 試合日時と主審 -->
           <div class="text-center text-sm text-gray-400 mb-2 text-left">
-            <div>Date: {{ formatDate(match.utc_date) }}</div>
+            <div>Date: {{ formatDateTime(match.utc_date, 'date') }}</div>
             <div v-if="match.referees && match.referees.length > 0">
               Referee: {{ match.referees[0].name }}
             </div>
@@ -50,12 +50,6 @@
           <div class="flex justify-between items-center">
             <!-- ホームチーム -->
             <div class="flex items-center flex-1">
-              <!-- <img
-                v-if="match.homeTeam.crest"
-                :src="match.homeTeam.crest"
-                :alt="match.homeTeam.name"
-                class="w-8 h-8 mr-2"
-              /> -->
               <span class="text-xl font-semibold">{{ match.home_team }}</span>
             </div>
 
@@ -64,19 +58,13 @@
                 {{ match.score }}
               </div>
               <div v-else class="text-2xl font-bold text-yellow-500">
-                {{ formatTime(match.utc_date) }}
+                {{ formatDateTime(match.utc_date, 'time') }}
               </div>
             </div>
 
             <!-- アウェイチーム -->
             <div class="flex items-center flex-1 justify-end">
               <span class="text-xl font-semibold">{{ match.away_team }}</span>
-              <!-- <img
-                v-if="match.awayTeam.crest"
-                :src="match.awayTeam.crest"
-                :alt="match.awayTeam.name"
-                class="w-8 h-8 ml-2"
-              /> -->
             </div>
           </div>
 
@@ -85,12 +73,20 @@
             <h4 class="font-semibold mb-2">Goals:</h4>
             <div class="grid grid-cols-2 gap-2">
               <div class="text-left">
-                <div v-for="goal in homeGoals(match)" :key="goal.minute" class="text-gray-300">
+                <div
+                  v-for="goal in getGoals(match, 'HOME')"
+                  :key="goal.minute"
+                  class="text-gray-300"
+                >
                   ⚽ {{ goal.minute }}' {{ goal.scorer }}
                 </div>
               </div>
               <div class="text-right">
-                <div v-for="goal in awayGoals(match)" :key="goal.minute" class="text-gray-300">
+                <div
+                  v-for="goal in getGoals(match, 'AWAY')"
+                  :key="goal.minute"
+                  class="text-gray-300"
+                >
                   {{ goal.scorer }} {{ goal.minute }}' ⚽
                 </div>
               </div>
@@ -98,115 +94,79 @@
           </div>
         </div>
       </div>
+
+      <!-- ページネーション -->
+      <div v-if="total > 0" class="flex justify-center mt-6">
+        <el-pagination
+          v-model:current-page="currentPage"
+          :page-size="10"
+          :total="total"
+          layout="prev, pager, next"
+          @current-change="goToPage"
+        />
+      </div>
     </div>
   </Background>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useApi } from '../composables/api'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
 import Title from '../components/Title.vue'
 import Background from '../components/Background.vue'
-import { useCache } from '../composables/useCache'
 
 const api = useApi()
 const matches = ref([])
 const loading = ref(true)
 const error = ref(null)
 const selectedCompetition = ref('Premier League')
+const currentPage = ref(1)
+const total = ref(0)
 
 const competitions = [
   { id: 'Premier League', name: 'Premier League' },
   { id: 'Europa Lg', name: 'Europa League' },
   { id: 'FA Cup', name: 'FA Cup' },
   { id: 'EFL Cup', name: 'League Cup' }
-  // 必要に応じて他の大会も追加
 ]
 
-const cache = useCache()
-
-const sortedMatches = computed(() => {
-  const now = new Date()
-
-  return [...matches.value].sort((a, b) => {
-    const dateA = new Date(a.utc_date)
-    const dateB = new Date(b.utc_date)
-
-    // 未来の試合（これから行われる試合）
-    const aIsFuture = dateA > now
-    const bIsFuture = dateB > now
-
-    // 両方とも未来の試合の場合は、より近い日付が先頭に
-    if (aIsFuture && bIsFuture) {
-      return dateA - dateB
-    }
-    // 両方とも過去の試合の場合は、より古い日付が後ろに
-    else if (!aIsFuture && !bIsFuture) {
-      return dateB - dateA
-    }
-    // 未来の試合を過去の試合より前に
-    else {
-      return aIsFuture ? -1 : 1
-    }
-  })
-})
-
-// 大会名を取得
-function getCompetitionName(id) {
-  const competition = competitions.find(c => c.id === id)
-  return competition ? competition.name : ''
+// 日付と時間のフォーマット
+function formatDateTime(utc_date, type = 'date') {
+  const date = new Date(utc_date)
+  return type === 'date'
+    ? date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long'
+      })
+    : date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      })
 }
 
-// Date formatting
-function formatDate(utc_date) {
-  return new Date(utc_date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    weekday: 'long'
-  })
-}
-
-// Time formatting
-function formatTime(utc_date) {
-  return new Date(utc_date).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true // 12時間形式（AM/PM）を使用
-  })
-}
-
-// ホームチームの得点者
-function homeGoals(match) {
-  return match.goals?.filter(goal => goal.team === 'HOME') || []
-}
-
-// アウェイチームの得点者
-function awayGoals(match) {
-  return match.goals?.filter(goal => goal.team === 'AWAY') || []
+function getGoals(match, team) {
+  return match.goals?.filter(goal => goal.team === team) || []
 }
 
 const fetchMatches = async () => {
   loading.value = true
   error.value = null
-  const cacheKey = `matches-${selectedCompetition.value}`
 
   try {
-    // キャッシュ優先
-    const cached = cache.get(cacheKey)
-    if (cached) {
-      matches.value = cached.matches
-      return
-    }
-
     const response = await api.get('/matches', {
-      params: { competition_id: selectedCompetition.value }
+      params: {
+        competition_id: selectedCompetition.value,
+        page: currentPage.value,
+        per_page: 10
+      }
     })
-    const matchesData = response.matches
-    matches.value = matchesData.matches
-    cache.set(cacheKey, matchesData)
+    matches.value = response.matches?.matches || []
+    total.value = response.matches?.total || 0
   } catch (err) {
     matches.value = []
     error.value = 'Failed to load matches'
@@ -218,6 +178,13 @@ const fetchMatches = async () => {
 
 function selectCompetition(competitionId) {
   selectedCompetition.value = competitionId
+  currentPage.value = 1 // ページをリセット
+  fetchMatches()
+}
+
+function goToPage(page) {
+  if (page < 1) return
+  currentPage.value = page
   fetchMatches()
 }
 
@@ -233,5 +200,21 @@ onMounted(() => {
 
 .match-item:hover {
   transform: translateY(-2px);
+}
+
+:deep(.el-pagination) {
+  @apply bg-gray-900 rounded-lg px-6 py-2 shadow-lg flex justify-center;
+}
+:deep(.el-pagination .el-pager li) {
+  @apply bg-black text-red-700 rounded font-bold mx-1 transition cursor-pointer border border-gray-300 hover:bg-red-100;
+}
+:deep(.el-pagination .el-pager li.is-active) {
+  @apply bg-red-700 text-white border-red-700;
+}
+:deep(.el-pagination button) {
+  @apply bg-black text-red-700 rounded font-bold mx-1 transition border border-gray-300 px-2 hover:bg-red-100;
+}
+:deep(.el-pagination button:disabled) {
+  @apply opacity-50 cursor-not-allowed;
 }
 </style>
