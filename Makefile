@@ -1,7 +1,7 @@
 u:
 	docker compose up
 us:
-	docker compose up backend frontend
+	docker compose up backend frontend db
 b:
 	docker compose build
 no-cache:
