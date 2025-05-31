@@ -55,20 +55,6 @@ services:
     volumes:
       - minio-data:/data
 
-  sidekiq:
-    build: ./backend
-    command: bundle exec sidekiq -C config/sidekiq.yml
-    volumes:
-      - ./backend:/app
-      - bundle_cache:/usr/local/bundle
-    depends_on:
-      - db
-      - redis
-    environment:
-      - RAILS_ENV=development
-      - REDIS_URL=redis://redis:6379/0
-    container_name: sidekiq
-
   redis:
     image: redis:7
     container_name: redis
