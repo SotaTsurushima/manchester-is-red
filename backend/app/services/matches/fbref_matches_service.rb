@@ -28,9 +28,10 @@ module Matches
           goals_for = row.at_css('td[data-stat="goals_for"]')&.text&.strip
           goals_against = row.at_css('td[data-stat="goals_against"]')&.text&.strip
           opponent_name = row.at_css('td[data-stat="opponent"] a')&.text&.strip
+          referee = row.at_css('td[data-stat="referee"]')&.text&.strip
 
           # 必要な値が取得できているか確認
-          puts [date, time, competition_name, round, day, venue, result, goals_for, goals_against, opponent_name].join(' | ')
+          puts [date, time, competition_name, round, day, venue, result, goals_for, goals_against, opponent_name, referee].join(' | ')
 
           next unless date && opponent_name
 
@@ -65,6 +66,7 @@ module Matches
           match.score = "#{goals_for} - #{goals_against}"
           match.venue = venue
           match.status = result
+          match.referees = referee
           match.save!
         end
       end
