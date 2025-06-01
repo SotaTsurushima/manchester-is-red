@@ -41,7 +41,7 @@
           <div class="text-center text-sm text-gray-400 mb-2 text-left">
             <div>Date: {{ formatDateTime(match.utc_date, 'date') }}</div>
             <div v-if="match.referees && match.referees.length > 0">
-              Referee: {{ match.referees[0].name }}
+              Referee: {{ match.referees }}
             </div>
             <div v-if="match.venue">Venue: {{ match.venue }}</div>
           </div>
