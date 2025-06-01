@@ -16,20 +16,16 @@ module Teams
         next unless squad_td
 
         team_name = squad_td.at_css('a')&.text&.strip
-        team_url = squad_td.at_css('a')&.attr('href')
         crest_img = squad_td.at_css('img')
         crest_url = crest_img&.attr('src')
         crest_url = "https://fbref.com#{crest_url}" if crest_url&.start_with?('/')
 
-        next unless team_name
+        # crest_urlがない場合はスキップ
+        next unless team_name && crest_url.present?
 
         team = Team.find_or_initialize_by(name: team_name)
-        
-        if crest_url.present?
-          minio_url = Teams::TeamUploader.upload_from_url(crest_url, team_name)
-          team.crest_url = minio_url
-        end
-        
+        minio_url = Teams::TeamUploader.upload_from_url(crest_url, team_name)
+        team.crest_url = minio_url
         team.save!
       end
     end
