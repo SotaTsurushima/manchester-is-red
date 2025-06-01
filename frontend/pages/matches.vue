@@ -50,7 +50,13 @@
           <div class="flex justify-between items-center">
             <!-- ホームチーム -->
             <div class="flex items-center flex-1">
-              <span class="text-xl font-semibold">{{ match.home_team }}</span>
+              <img
+                v-if="match.home_team?.crest_url"
+                :src="match.home_team.crest_url"
+                alt="Home Team Crest"
+                class="w-8 h-8 mr-2 inline-block align-middle"
+              />
+              <span class="text-xl font-semibold">{{ match.home_team?.name }}</span>
             </div>
 
             <div class="flex-none px-4">
@@ -64,7 +70,13 @@
 
             <!-- アウェイチーム -->
             <div class="flex items-center flex-1 justify-end">
-              <span class="text-xl font-semibold">{{ match.away_team }}</span>
+              <span class="text-xl font-semibold">{{ match.away_team?.name }}</span>
+              <img
+                v-if="match.away_team?.crest_url"
+                :src="match.away_team.crest_url"
+                alt="Away Team Crest"
+                class="w-8 h-8 ml-2 inline-block align-middle"
+              />
             </div>
           </div>
 
