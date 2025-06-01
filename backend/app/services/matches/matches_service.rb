@@ -9,10 +9,11 @@ module Matches
     def self.get_matches(competition_id, page: 1, per_page: 10)
       db_value = COMPETITION_MAP[competition_id] || competition_id
       Rails.cache.fetch("matches/#{db_value}/page#{page}/per#{per_page}/desc", expires_in: 5.minutes) do
-        matches = ::Match.where(competition: db_value)
-                         .order(utc_date: :desc)
-                         .page(page)
-                         .per(per_page)
+        matches = ::Match
+                    .where(competition: db_value)
+                    .order(utc_date: :desc)
+                    .page(page)
+                    .per(per_page)
         {
           matches: matches.as_json,
           competition: db_value,
