@@ -56,17 +56,16 @@ module Matches
           next unless date_obj
 
           # 5. matchesテーブルの保存時にteam_idを使う
-          Match.find_or_initialize_by(
+          match = Match.find_or_initialize_by(
             utc_date: date_obj,
-            home_team_id: home_team.id,
-            away_team_id: away_team.id,
             competition: competition_name
-          ).tap do |m|
-            m.score = "#{goals_for} - #{goals_against}"
-            m.venue = venue
-            m.status = result
-            m.save!
-          end
+          )
+          match.home_team_id = home_team.id
+          match.away_team_id = away_team.id
+          match.score = "#{goals_for} - #{goals_against}"
+          match.venue = venue
+          match.status = result
+          match.save!
         end
       end
     end
