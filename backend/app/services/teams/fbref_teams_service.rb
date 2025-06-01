@@ -7,7 +7,6 @@ module Teams
       'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }.freeze
 
-    # プレミアリーグのチーム一覧を取得
     def fetch_premier_league_teams
       url = 'https://fbref.com/en/comps/9/Premier-League-Stats'
       doc = fetch_with_retry(url)
@@ -26,7 +25,6 @@ module Teams
 
         team = Team.find_or_initialize_by(name: team_name)
         
-        # minioにアップロード
         if crest_url.present?
           minio_url = Teams::TeamUploader.upload_from_url(crest_url, team_name)
           team.crest_url = minio_url
