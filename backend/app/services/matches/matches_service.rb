@@ -15,7 +15,12 @@ module Matches
                     .page(page)
                     .per(per_page)
         {
-          matches: matches.as_json,
+          matches: matches.as_json(
+            include: {
+              home_team: { only: [:id, :name, :crest_url] },
+              away_team: { only: [:id, :name, :crest_url] }
+            }
+          ),
           competition: db_value,
           page: matches.current_page,
           per_page: matches.limit_value,
