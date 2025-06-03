@@ -4,7 +4,7 @@ class FetchTeamsWorker
 
   def perform
     begin
-      Teams::FbrefTeamsService.new.fetch_premier_league_teams
+      Teams::FootballOrgTeamsService.new.fetch_and_save_teams
       Rails.logger.info 'Successfully fetched and saved teams from FBref.'
     rescue => e
       Rails.logger.error "Error fetching teams: #{e.message}"
