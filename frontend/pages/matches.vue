@@ -168,7 +168,7 @@ function getGoals(match, team) {
 function displayScore(match) {
   if (!match.score) return ''
   const [home, away] = match.score.split('-').map(s => s.trim())
-  if (match.away_team === 'Manchester United') {
+  if (match.away_team?.name === 'Manchester United') {
     return `${away} - ${home}`
   }
   return match.score
