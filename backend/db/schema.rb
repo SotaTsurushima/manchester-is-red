@@ -10,11 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_03_142011) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_03_145901) do
   create_table "matches", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.datetime "utc_date"
-    t.string "home_team"
-    t.string "away_team"
+    t.bigint "home_team_id", null: false
+    t.bigint "away_team_id", null: false
+    t.datetime "utc_date", precision: nil, null: false
     t.string "competition"
     t.string "score"
     t.string "venue"
@@ -22,10 +22,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_03_142011) do
     t.string "referees"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "home_team_id"
-    t.bigint "away_team_id"
-    t.index ["away_team_id"], name: "fk_rails_6a75121a9b"
-    t.index ["home_team_id"], name: "fk_rails_4aed6bdf0d"
+    t.index ["away_team_id"], name: "index_matches_on_away_team_id"
+    t.index ["home_team_id"], name: "index_matches_on_home_team_id"
   end
 
   create_table "players", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -46,7 +44,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_03_142011) do
   end
 
   create_table "teams", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.string "crest_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
