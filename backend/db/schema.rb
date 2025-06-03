@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_25_134135) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_03_142011) do
   create_table "matches", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "utc_date"
     t.string "home_team"
@@ -22,8 +22,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_25_134135) do
     t.string "referees"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "home_team_id"
-    t.integer "away_team_id"
+    t.bigint "home_team_id"
+    t.bigint "away_team_id"
+    t.index ["away_team_id"], name: "fk_rails_6a75121a9b"
+    t.index ["home_team_id"], name: "fk_rails_4aed6bdf0d"
   end
 
   create_table "players", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -49,4 +51,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_25_134135) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "matches", "teams", column: "away_team_id"
+  add_foreign_key "matches", "teams", column: "home_team_id"
 end
