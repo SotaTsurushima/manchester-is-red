@@ -6,14 +6,35 @@ module Teams
     API_KEY = ENV['FOOTBALL_API_KEY'] # .envやcredentialsで管理推奨
     BASE_URL = 'https://api.football-data.org/v4/competitions/PL/teams'
 
-    def fetch_and_save_teams
+    TEAM_NAME_MAP = {
+      "Wolverhampton Wanderers FC" => "Wolves",
+      "Newcastle United FC" => "Newcastle Utd",
+      "Nottingham Forest FC" => "Nott'ham Forest",
+      # 他にも必要に応じて追加
+    }
+
+    def update_crest_urls
       data = fetch_with_retry_api(BASE_URL)
       data['teams'].each do |team|
-        name = team['name']
-        crest_url = team['crest']
-        minio_url = Teams::TeamUploader.upload_from_url(crest_url, name)
+        api_name = team['name']
+        db_name = TEAM_NAME_MAP[api_name] || api_name.gsub(/ (FC|AFC)$/, '')
+        search_name = db_name.gsub(/ (FC|AFC)$/, '')
 
-        t = Team.find_or_initialize_by(name: name)
+        puts search_name
+        crest_url = team['crest']
+
+        t = Team.where('name LIKE ?', "%#{db_name}%").first
+        unless t
+          Team.all.each do |team_record|
+            if db_name.include?(team_record.name)
+              t = team_record
+              break
+            end
+          end
+        end
+        next unless t # 既存レコードのみ処理
+
+        minio_url = Teams::TeamUploader.upload_from_url(crest_url, search_name)
         t.crest_url = minio_url
         t.save!
       end
