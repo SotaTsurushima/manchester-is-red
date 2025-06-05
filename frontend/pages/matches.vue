@@ -107,7 +107,6 @@
         </div>
       </div>
 
-      <!-- ページネーション -->
       <div v-if="total > 0" class="flex justify-center mt-6">
         <el-pagination
           v-model:current-page="currentPage"
