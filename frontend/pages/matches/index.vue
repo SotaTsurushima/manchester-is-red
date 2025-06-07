@@ -32,78 +32,80 @@
         <div v-if="matches.length === 0" class="text-center text-xl text-gray-400">
           No matches found for {{ selectedCompetition }}.
         </div>
-        <div
-          v-for="match in matches"
-          :key="match.id"
-          class="text-center match-item p-5 mb-4 rounded-lg bg-gray-800 text-white shadow-lg hover:shadow-2xl transition-all duration-200"
-        >
-          <!-- 試合日時と主審 -->
-          <div class="text-center text-sm text-gray-400 mb-2 text-left">
-            <div>Date: {{ formatDateTime(match.utc_date, 'date') }}</div>
-            <div v-if="match.referees && match.referees.length > 0">
-              Referee: {{ match.referees }}
-            </div>
-            <div v-if="match.venue">Venue: {{ match.venue }}</div>
-          </div>
-
-          <!-- チーム情報とスコア -->
-          <div class="flex justify-between items-center">
-            <!-- ホームチーム -->
-            <div class="flex items-center flex-1">
-              <img
-                v-if="match.home_team?.crest_url"
-                :src="match.home_team.crest_url"
-                alt="Home Team Crest"
-                class="w-8 h-8 mr-2 inline-block align-middle"
-              />
-              <span class="text-xl font-semibold">{{ match.home_team?.name }}</span>
-            </div>
-
-            <div class="flex-none px-4">
-              <div v-if="match.status" class="text-2xl font-bold">
-                {{ displayScore(match) }}
+        <div v-for="match in matches" :key="match.id">
+          <NuxtLink :to="`/matches/${match.id}`" class="block">
+            <div
+              class="text-center match-item p-5 mb-4 rounded-lg bg-gray-800 text-white shadow-lg hover:shadow-2xl transition-all duration-200"
+            >
+              <!-- 試合日時と主審 -->
+              <div class="text-center text-sm text-gray-400 mb-2 text-left">
+                <div>Date: {{ formatDateTime(match.utc_date, 'date') }}</div>
+                <div v-if="match.referees && match.referees.length > 0">
+                  Referee: {{ match.referees }}
+                </div>
+                <div v-if="match.venue">Venue: {{ match.venue }}</div>
               </div>
-              <div v-else class="text-2xl font-bold text-yellow-500">
-                {{ formatDateTime(match.utc_date, 'time') }}
-              </div>
-            </div>
 
-            <!-- アウェイチーム -->
-            <div class="flex items-center flex-1 justify-end">
-              <span class="text-xl font-semibold">{{ match.away_team?.name }}</span>
-              <img
-                v-if="match.away_team?.crest_url"
-                :src="match.away_team.crest_url"
-                alt="Away Team Crest"
-                class="w-8 h-8 ml-2 inline-block align-middle"
-              />
-            </div>
-          </div>
+              <!-- チーム情報とスコア -->
+              <div class="flex justify-between items-center">
+                <!-- ホームチーム -->
+                <div class="flex items-center flex-1">
+                  <img
+                    v-if="match.home_team?.crest_url"
+                    :src="match.home_team.crest_url"
+                    alt="Home Team Crest"
+                    class="w-8 h-8 mr-2 inline-block align-middle"
+                  />
+                  <span class="text-xl font-semibold">{{ match.home_team?.name }}</span>
+                </div>
 
-          <!-- 試合詳細（得点者など） -->
-          <div v-if="match.goals && match.goals.length > 0" class="mt-4 text-sm">
-            <h4 class="font-semibold mb-2">Goals:</h4>
-            <div class="grid grid-cols-2 gap-2">
-              <div class="text-left">
-                <div
-                  v-for="goal in getGoals(match, 'HOME')"
-                  :key="goal.minute"
-                  class="text-gray-300"
-                >
-                  ⚽ {{ goal.minute }}' {{ goal.scorer }}
+                <div class="flex-none px-4">
+                  <div v-if="match.status" class="text-2xl font-bold">
+                    {{ displayScore(match) }}
+                  </div>
+                  <div v-else class="text-2xl font-bold text-yellow-500">
+                    {{ formatDateTime(match.utc_date, 'time') }}
+                  </div>
+                </div>
+
+                <!-- アウェイチーム -->
+                <div class="flex items-center flex-1 justify-end">
+                  <span class="text-xl font-semibold">{{ match.away_team?.name }}</span>
+                  <img
+                    v-if="match.away_team?.crest_url"
+                    :src="match.away_team.crest_url"
+                    alt="Away Team Crest"
+                    class="w-8 h-8 ml-2 inline-block align-middle"
+                  />
                 </div>
               </div>
-              <div class="text-right">
-                <div
-                  v-for="goal in getGoals(match, 'AWAY')"
-                  :key="goal.minute"
-                  class="text-gray-300"
-                >
-                  {{ goal.scorer }} {{ goal.minute }}' ⚽
+
+              <!-- 試合詳細（得点者など） -->
+              <div v-if="match.goals && match.goals.length > 0" class="mt-4 text-sm">
+                <h4 class="font-semibold mb-2">Goals:</h4>
+                <div class="grid grid-cols-2 gap-2">
+                  <div class="text-left">
+                    <div
+                      v-for="goal in getGoals(match, 'HOME')"
+                      :key="goal.minute"
+                      class="text-gray-300"
+                    >
+                      ⚽ {{ goal.minute }}' {{ goal.scorer }}
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div
+                      v-for="goal in getGoals(match, 'AWAY')"
+                      :key="goal.minute"
+                      class="text-gray-300"
+                    >
+                      {{ goal.scorer }} {{ goal.minute }}' ⚽
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </NuxtLink>
         </div>
       </div>
 
