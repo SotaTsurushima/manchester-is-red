@@ -12,6 +12,9 @@ module NewsSources
       URI.open(GOOGLE_NEWS_RSS_URL) do |rss|
         feed = RSS::Parser.parse(rss)
         feed.items.first(10).each do |item|
+          # pubDateが2日以内か判定
+          next unless item.pubDate && item.pubDate.to_date >= Date.today - 1
+
           articles << {
             title: item.title,
             url: item.link,

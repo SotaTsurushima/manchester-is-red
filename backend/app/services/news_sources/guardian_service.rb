@@ -32,6 +32,8 @@ module NewsSources
           source: 'The Guardian',
           reliability: 'Tier 1'
         }
+      end.select do |news|
+        news[:date] && Date.parse(news[:date]) >= Date.today - 2
       end
     rescue => e
       Rails.logger.error("Guardian API fetch error: #{e}")

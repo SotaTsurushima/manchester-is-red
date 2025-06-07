@@ -9,7 +9,10 @@ module NewsSources
         response = self.class.get('/manchester-united-news')
         raise "Failed to fetch news. Status: #{response.code}" unless response.success?
 
-        parse_news_items(Nokogiri::HTML(response.body))
+        all_news = parse_news_items(Nokogiri::HTML(response.body))
+        all_news.select do |news|
+          news[:date] && news[:date] >= Date.today - 2
+        end
       end
     end
 
