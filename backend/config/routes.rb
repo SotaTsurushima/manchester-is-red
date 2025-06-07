@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   get '/injuries', to: 'injury_players#index'
   post 'upload', to: 'uploads#create'
   resources :players, only: [:index, :create, :show, :update, :destroy]
+  resources :matches, only: [:index, :show]
 
   get "up" => "rails/health#show", as: :rails_health_check
 end
