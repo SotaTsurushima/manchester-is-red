@@ -122,7 +122,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useApi } from '../composables/api'
+import { useApi } from '../../composables/api'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
 import Title from '../components/Title.vue'
