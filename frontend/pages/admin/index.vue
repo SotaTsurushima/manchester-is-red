@@ -59,42 +59,6 @@
           <p class="text-3xl font-bold text-yellow-400">{{ totalTeams }}チーム</p>
         </div>
       </div>
-
-      <!-- 最近の試合 -->
-      <div class="mb-8">
-        <h2 class="text-2xl font-bold text-white mb-6">最近の試合</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div
-            v-for="match in recentMatches"
-            :key="match.id"
-            class="bg-white bg-opacity-10 rounded-lg p-4"
-          >
-            <h3 class="text-lg font-bold text-white mb-2">
-              {{ match.home_team.name }} vs {{ match.away_team.name }}
-            </h3>
-            <p class="text-gray-300 mb-1">{{ match.competition }}</p>
-            <p class="text-gray-300 mb-2">{{ formatDate(match.utc_date) }}</p>
-            <p class="text-xl font-bold text-white">{{ match.score || '未実施' }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 得点ランキング -->
-      <div class="mb-8">
-        <h2 class="text-2xl font-bold text-white mb-6">得点ランキング</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div
-            v-for="player in topScorers"
-            :key="player.id"
-            class="bg-white bg-opacity-10 rounded-lg p-4"
-          >
-            <h3 class="text-lg font-bold text-white mb-2">{{ player.name }}</h3>
-            <p class="text-gray-300 mb-1">{{ player.goals }}得点</p>
-            <p class="text-gray-300 mb-1">{{ player.assists }}アシスト</p>
-            <p class="text-gray-300">MVP: {{ player.mvp }}回</p>
-          </div>
-        </div>
-      </div>
     </Background>
   </div>
 </template>
