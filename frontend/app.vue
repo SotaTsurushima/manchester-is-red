@@ -1,13 +1,14 @@
 <template>
   <div>
-    <!-- 管理画面以外でナビゲーションを表示 -->
     <Navigation v-if="!isAdminPage" />
+    <AdminNavigation v-if="isAdminPage" />
     <NuxtPage />
   </div>
 </template>
 
 <script setup>
 import Navigation from '~/components/Navigation.vue'
+import AdminNavigation from '~/components/AdminNavigation.vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
