@@ -5,7 +5,7 @@
       <div class="flex flex-col items-center mb-8">
         <Title title="Manchester United Players" subtitle="Admin - Squad Management" />
         <NuxtLink
-          to="/players/add"
+          to="players/add"
           class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
         >
           add player
