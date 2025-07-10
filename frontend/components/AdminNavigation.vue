@@ -9,7 +9,7 @@
             class="hover:text-blue-300 transition"
             :class="{ 'text-blue-300': $route.path === '/admin' }"
           >
-            dashboard
+            Dashboard
           </NuxtLink>
           <NuxtLink
             to="/admin/players"
@@ -23,12 +23,19 @@
             class="hover:text-blue-300 transition"
             :class="{ 'text-blue-300': $route.path.startsWith('/admin/matches') }"
           >
-            matches
+            Matches
+          </NuxtLink>
+          <NuxtLink
+            to="/admin/batch"
+            class="hover:text-blue-300 transition"
+            :class="{ 'text-blue-300': $route.path.startsWith('/admin/matches') }"
+          >
+            Batches
           </NuxtLink>
         </div>
       </div>
       <NuxtLink to="/" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
-        サイトに戻る
+        Back to Site
       </NuxtLink>
     </div>
   </nav>
