@@ -1,14 +1,6 @@
 <template>
   <Background>
-    <div class="flex flex-col items-center mb-8">
-      <Title title="Manchester United Players" subtitle="Squad List" />
-      <NuxtLink
-        to="/players/add"
-        class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-      >
-        add player
-      </NuxtLink>
-    </div>
+    <Title title="Manchester United Players" subtitle="Squad List" />
     <div class="space-y-12">
       <template v-for="(players, position) in groupedPlayers" :key="position">
         <div v-if="players.length > 0" class="mb-12">
@@ -25,8 +17,6 @@
                 image: player.image,
                 description: position,
                 reliability: player.number,
-                date: '',
-                url: `/players/${player.id}/edit`
               }"
               type="player"
             />
