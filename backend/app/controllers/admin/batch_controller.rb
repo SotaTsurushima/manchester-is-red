@@ -1,8 +1,4 @@
-# backend/app/controllers/admin/batch_controller.rb
 class Admin::BatchController < ApplicationController
-  
-  binding.pry
-  
   include ErrorHandler
 
   def matches
