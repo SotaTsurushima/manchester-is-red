@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_03_145901) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_12_091749) do
   create_table "matches", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "home_team_id", null: false
     t.bigint "away_team_id", null: false
@@ -39,7 +39,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_03_145901) do
     t.integer "red_card"
     t.integer "appearances"
     t.decimal "market_value", precision: 10
-    t.integer "mvp"
     t.integer "salary"
   end
 

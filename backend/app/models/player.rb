@@ -4,6 +4,5 @@ class Player < ApplicationRecord
   validates :image, presence: true
   validates :yellow_card, :red_card, :appearances, numericality: { greater_than_or_equal_to: 0 }
   validates :market_value, numericality: { greater_than_or_equal_to: 0 }
-  validates :mvp, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
   validates :salary, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
 end

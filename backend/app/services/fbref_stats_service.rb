@@ -21,9 +21,7 @@ class FbrefStatsService
     goals: 'goals',
     assists: 'assists',
     yellow_card: 'cards_yellow',
-    red_card: 'cards_red',
-    # MVP情報は別途取得が必要なため一時的にコメントアウト
-    # mvp: 'player_of_match'
+    red_card: 'cards_red'
   }.freeze  
 
   BATCH_SIZE = 5
@@ -32,50 +30,6 @@ class FbrefStatsService
   def fetch_player_stats
     rows = fetch_player_rows
     process_rows(rows)
-  end
-
-  def debug_table_structure
-    puts "=== Debugging FBRef Table Structure ==="
-    doc = fetch_with_retry(FBREF_URL)
-    
-    # テーブルの存在確認
-    table = doc.css('table#stats_standard_9')
-    puts "Table found: #{table.any?}"
-    
-    if table.any?
-      # ヘッダー行を確認
-      headers = table.css('thead th')
-      puts "Headers found: #{headers.count}"
-      headers.each_with_index do |header, index|
-        stat = header['data-stat']
-        text = header.text.strip
-        puts "#{index}: #{stat} - '#{text}'"
-      end
-      
-      # 最初の選手行を確認
-      first_row = table.css('tbody tr').first
-      if first_row
-        puts "\nFirst player row:"
-        first_row.css('td').each_with_index do |cell, index|
-          stat = cell['data-stat']
-          text = cell.text.strip
-          puts "#{index}: #{stat} - '#{text}'"
-        end
-      end
-    end
-    
-    puts "=== End Debug ==="
-  end
-
-  # 簡単なデバッグ用メソッド
-  def debug_mvp_availability
-    doc = fetch_with_retry(FBREF_URL)
-    puts "Available data-stat attributes for first player:"
-    first_row = doc.css('table#stats_standard_9 tbody tr').first
-    first_row&.css('td')&.each do |cell|
-      stat = cell['data-stat']
-      puts "  #{stat}: '#{cell.text.strip}'" if stat
-    end
   end
 
   private
