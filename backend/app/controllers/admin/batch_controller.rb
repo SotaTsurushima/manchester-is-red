@@ -2,17 +2,17 @@ class Admin::BatchController < ApplicationController
   include ErrorHandler
 
   def matches
-    FetchMatchesWorker.perform_async
+    FetchMatchesWorker.new.perform
     render json: { success: true, message: "Matches batch started" }
   end
 
   def players_stats
-    FetchPlayerStatsWorker.perform_async
+    FetchPlayerStatsWorker.new.perform
     render json: { success: true, message: "Players stats batch started" }
   end
 
   def teams
-    FetchTeamsWorker.perform_async
+    FetchTeamsWorker.new.perform
     render json: { success: true, message: "Teams batch started" }
   end
 end
