@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  mount_devise_token_auth_for 'User', at: 'auth'
   get "/matches", to: "matches#index"
   get "/transfers", to: "transfers#index"
   get '/injuries', to: 'injury_players#index'
