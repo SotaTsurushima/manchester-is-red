@@ -12,6 +12,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.11.1",
     "element-plus": "^2.9.11",
     "nuxt": "^3.16.2",
     "pinia": "^3.0.3",
