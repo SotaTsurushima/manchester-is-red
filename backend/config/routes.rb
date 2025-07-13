@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   post 'upload', to: 'uploads#create'
   resources :players, only: [:index, :create, :show, :update, :destroy]
   resources :matches, only: [:index, :show]
+  resources :users, only: [:index, :show]
 
   namespace :admin do
     post 'batch/matches', to: 'batch#matches'
