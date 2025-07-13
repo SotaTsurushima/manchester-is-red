@@ -28,6 +28,9 @@ gem 'sidekiq-scheduler'
 gem 'selenium-webdriver'
 gem 'kaminari'
 gem 'bcrypt', '~> 3.1.7'
+gem 'jwt'
+gem 'devise_token_auth'
+gem 'devise'
 
 group :development do
   gem "pry"

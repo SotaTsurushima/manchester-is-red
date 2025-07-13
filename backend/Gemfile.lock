@@ -110,6 +110,16 @@ GEM
     debug (1.10.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    devise (4.9.4)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 4.1.0)
+      responders
+      warden (~> 1.2.3)
+    devise_token_auth (1.2.5)
+      bcrypt (~> 3.0)
+      devise (> 3.5.2, < 5)
+      rails (>= 4.2.0, < 8.1)
     dotenv (3.1.8)
     dotenv-rails (3.1.8)
       dotenv (= 3.1.8)
@@ -137,6 +147,8 @@ GEM
       reline (>= 0.4.2)
     jmespath (1.6.2)
     json (2.11.3)
+    jwt (3.1.2)
+      base64
     kamal (2.5.3)
       activesupport (>= 7.0)
       base64 (~> 0.2)
@@ -196,6 +208,7 @@ GEM
     nio4r (2.7.4)
     nokogiri (1.18.8-x86_64-linux-gnu)
       racc (~> 1.4)
+    orm_adapter (0.5.0)
     ostruct (0.6.1)
     parallel (1.27.0)
     parser (3.3.8.0)
@@ -265,6 +278,9 @@ GEM
     regexp_parser (2.10.0)
     reline (0.6.1)
       io-console (~> 0.5)
+    responders (3.1.1)
+      actionpack (>= 5.2)
+      railties (>= 5.2)
     rexml (3.4.1)
     rss (0.3.1)
       rexml
@@ -350,6 +366,8 @@ GEM
     unicode-emoji (4.0.4)
     uri (1.0.3)
     useragent (0.16.11)
+    warden (1.2.9)
+      rack (>= 2.0.9)
     websocket (1.2.11)
     websocket-driver (0.7.7)
       base64
@@ -366,8 +384,11 @@ DEPENDENCIES
   bootsnap
   brakeman
   debug
+  devise
+  devise_token_auth
   dotenv-rails
   httparty
+  jwt
   kamal
   kaminari
   mysql2 (~> 0.5.2)
