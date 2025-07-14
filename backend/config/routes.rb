@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   resources :users, only: [:index, :show]
 
   namespace :admin do
+    mount_devise_token_auth_for 'User', at: 'auth', controllers: {
+      sessions: 'admin/sessions'
+    }
     post 'batch/matches', to: 'batch#matches'
     post 'batch/players_stats', to: 'batch#players_stats'
     post 'batch/teams', to: 'batch#teams'
