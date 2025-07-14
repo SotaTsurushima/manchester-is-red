@@ -1,4 +1,4 @@
-class Admin::BatchController < ApplicationController
+class Admin::BatchController < Admin::BaseController
   include ErrorHandler
 
   def matches
