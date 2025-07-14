@@ -38,9 +38,9 @@ const totalTeams = ref(0)
 const recentMatches = ref([])
 const topScorers = ref([])
 
-const formatDate = dateString => {
-  return new Date(dateString).toLocaleDateString('ja-JP')
-}
+definePageMeta({
+  middleware: 'auth'
+})
 
 const fetchDashboardData = async () => {
   try {
