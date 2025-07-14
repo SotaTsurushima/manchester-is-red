@@ -19,13 +19,6 @@
             Players
           </NuxtLink>
           <NuxtLink
-            to="/admin/matches"
-            class="hover:text-blue-300 transition"
-            :class="{ 'text-blue-300': $route.path.startsWith('/admin/matches') }"
-          >
-            Matches
-          </NuxtLink>
-          <NuxtLink
             to="/admin/batch"
             class="hover:text-blue-300 transition"
             :class="{ 'text-blue-300': $route.path.startsWith('/admin/matches') }"
@@ -34,9 +27,33 @@
           </NuxtLink>
         </div>
       </div>
-      <NuxtLink to="/" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
-        Back to Site
-      </NuxtLink>
+      <div class="flex items-center space-x-4">
+        <span v-if="auth.user" class="mr-2">
+          Logined as {{ auth.user.name || auth.user.email }}
+        </span>
+        <NuxtLink
+          to="/"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+        >
+          Back to Site
+        </NuxtLink>
+        <button
+          @click="handleLogout"
+          class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition"
+        >
+          Logout
+        </button>
+      </div>
     </div>
   </nav>
 </template>
+
+<script setup lang="ts">
+import { useAuthStore } from '~/stores/auth'
+const auth = useAuthStore()
+
+const handleLogout = () => {
+  auth.logout()
+  window.location.href = '/admin/login'
+}
+</script>

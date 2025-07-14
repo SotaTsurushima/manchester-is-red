@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Navigation v-if="!isAdminPage" />
-    <AdminNavigation v-if="isAdminPage" />
+    <Navigation v-if="user && user.role === 'user'" />
+    <AdminNavigation v-if="user && user.role === 'admin'" />
     <NuxtPage />
   </div>
 </template>
@@ -9,10 +9,9 @@
 <script setup>
 import Navigation from '~/components/Navigation.vue'
 import AdminNavigation from '~/components/AdminNavigation.vue'
-import { useRoute } from 'vue-router'
+import { useAuthStore } from '~/stores/auth'
+import { computed } from 'vue'
 
-const route = useRoute()
-
-// 管理画面かどうかを判定
-const isAdminPage = route.path.startsWith('/admin')
+const auth = useAuthStore()
+const user = computed(() => auth.user)
 </script>
