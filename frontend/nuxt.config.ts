@@ -20,6 +20,12 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxtjs/tailwindcss',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt'
   ],
+  nitro: {
+    routeRules: {
+      '/.well-known/**': { statusCode: 404 }
+    }
+  }
 });
