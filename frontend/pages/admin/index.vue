@@ -69,5 +69,7 @@ const fetchDashboardData = async () => {
 
 onMounted(() => {
   fetchDashboardData()
+  const auth = useAuthStore()
+  auth.loadTokens()
 })
 </script>
