@@ -1,20 +1,17 @@
-// frontend/middleware/auth.ts
-import { useAuthStore } from '~/stores/auth'
+import { useAuth } from '~/composables/useAuth'
 
-export default defineNuxtRouteMiddleware((to, from) => {
-  const auth = useAuthStore()
-  auth.loadTokens()
-  if (!auth.tokenHeaders['access-token'] || !auth.tokenHeaders['client'] || !auth.tokenHeaders['uid']) {
-    // 管理画面の場合は/admin/loginにリダイレクト
-    if (to.path.startsWith('/admin')) {
-      return navigateTo('/admin/login')
-    }
-    // それ以外は通常の/loginにリダイレクト
-    return navigateTo('/login')
-  }
+export default defineNuxtRouteMiddleware(to => {
+  if (!import.meta.client) return
 
-  // 未ログイン or adminでない場合はログインページへリダイレクト
-  if (!auth.user || auth.user.role !== 'admin') {
+  const auth = useAuth()
+
+  const hasTokens =
+    auth.tokenHeaders &&
+    auth.tokenHeaders['access-token'] &&
+    auth.tokenHeaders['client'] &&
+    auth.tokenHeaders['uid']
+
+  if (!auth.user || auth.user.role !== 'admin' || !hasTokens) {
     return navigateTo('/admin/login')
   }
 })
