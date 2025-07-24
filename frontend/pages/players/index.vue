@@ -16,9 +16,10 @@
                 title: player.name,
                 image: player.image,
                 description: position,
-                reliability: player.number,
+                reliability: player.number
               }"
               type="player"
+              :showProfile="false"
             />
           </div>
         </div>
