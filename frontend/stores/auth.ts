@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
 const TOKEN_KEYS = ['access-token', 'client', 'uid'] as const
-type TokenKey = typeof TOKEN_KEYS[number]
+type TokenKey = (typeof TOKEN_KEYS)[number]
 type TokenHeaders = Record<TokenKey, string>
 
 export const useAuthStore = defineStore('auth', {
@@ -9,11 +9,11 @@ export const useAuthStore = defineStore('auth', {
     user: null as Record<string, any> | null,
     tokenHeaders: {
       'access-token': '',
-      'client': '',
-      'uid': ''
+      client: '',
+      uid: ''
     } as TokenHeaders
   }),
-  persist: true,
+
   actions: {
     async login(email: string, password: string, isAdmin = false) {
       const config = useRuntimeConfig()
@@ -23,7 +23,7 @@ export const useAuthStore = defineStore('auth', {
       const response = await fetch(`${baseUrl}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password })
       })
 
       if (!response.ok) {
@@ -31,18 +31,12 @@ export const useAuthStore = defineStore('auth', {
         throw new Error(errorData.error || 'ログインに失敗しました')
       }
 
-      if (import.meta.client) {
-        this.saveTokenHeadersFromResponse(response)
-      }
-
       const data = await response.json()
       this.user = data.data || data
     },
     logout() {
       this.user = null
-      if (import.meta.client) {
-        this.clearTokenHeaders()
-      }
+      console.log('Logged out, store cleared')
     },
     loadTokens() {
       if (import.meta.client) {
@@ -51,24 +45,11 @@ export const useAuthStore = defineStore('auth', {
         })
       }
     },
-    setUser(user: Record<string, any> | null) {
-      this.user = user
-    },
-    setTokenHeaders(headers: TokenHeaders) {
-      this.tokenHeaders = headers
-    },
-    saveTokenHeadersFromResponse(response: Response) {
-      TOKEN_KEYS.forEach(key => {
-        const value = response.headers.get(key) || ''
-        this.tokenHeaders[key] = value
-        localStorage.setItem(key, value)
-      })
-    },
     clearTokenHeaders() {
       TOKEN_KEYS.forEach(key => {
         this.tokenHeaders[key] = ''
-        localStorage.removeItem(key)
       })
     }
-  }
+  },
+  persist: true
 })
