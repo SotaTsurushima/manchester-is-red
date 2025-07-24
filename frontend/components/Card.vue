@@ -98,14 +98,13 @@
         </div>
         <p v-if="item.fee" class="text-gray-600 mb-2">Fee: {{ item.fee }}</p>
       </template>
-      <!-- ニュース内容・選手用 -->
+      
       <template v-else>
         <h2 class="text-xl font-bold mb-2 line-clamp-2">{{ item.title }}</h2>
         <p v-if="item.description" class="text-gray-600 mb-4 line-clamp-2">
           {{ item.description }}
         </p>
         <div class="flex justify-end mt-4">
-          <!-- ニュース用 -->
           <a
             v-if="type === 'news' && item.url !== '#'"
             :href="item.url"
@@ -115,9 +114,8 @@
           >
             Read More
           </a>
-          <!-- 選手用 -->
           <NuxtLink
-            v-else-if="type === 'player'"
+            v-else-if="type === 'player' && showProfile"
             :to="item.url"
             class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-300"
           >
@@ -141,6 +139,10 @@ const props = defineProps({
     type: String,
     default: 'player',
     validator: value => ['news', 'player', 'injury'].includes(value)
+  },
+  showProfile: {
+    type: Boolean,
+    default: true
   }
 })
 
