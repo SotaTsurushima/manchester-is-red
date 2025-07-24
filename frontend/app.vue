@@ -1,8 +1,8 @@
 <template>
   <div>
     <client-only>
-      <Navigation v-if="user && user.role === 'user'" />
       <AdminNavigation v-if="user && user.role === 'admin'" />
+      <Navigation v-else />
     </client-only>
     <NuxtPage />
   </div>
