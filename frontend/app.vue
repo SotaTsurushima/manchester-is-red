@@ -1,7 +1,9 @@
 <template>
   <div>
-    <Navigation v-if="user && user.role === 'user'" />
-    <AdminNavigation v-if="user && user.role === 'admin'" />
+    <client-only>
+      <Navigation v-if="user && user.role === 'user'" />
+      <AdminNavigation v-if="user && user.role === 'admin'" />
+    </client-only>
     <NuxtPage />
   </div>
 </template>
