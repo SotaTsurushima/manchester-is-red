@@ -28,7 +28,7 @@
                   description: position,
                   reliability: player.number,
                   date: '',
-                  url: `/players/${player.id}/edit`
+                  url: `/admin/players/${player.id}/edit`
                 }"
                 type="player"
               />
