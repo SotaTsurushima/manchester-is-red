@@ -31,25 +31,54 @@ export const useAuthStore = defineStore('auth', {
         throw new Error(errorData.error || 'ログインに失敗しました')
       }
 
+      this.setTokensFromResponse(response)
       const data = await response.json()
       this.user = data.data || data
     },
+
     logout() {
       this.user = null
-      console.log('Logged out, store cleared')
+      this.clearTokens()
     },
-    loadTokens() {
-      if (import.meta.client) {
-        TOKEN_KEYS.forEach(key => {
-          this.tokenHeaders[key] = localStorage.getItem(key) || ''
-        })
+
+    setTokensFromResponse(response: Response) {
+      const tokens = {
+        'access-token': response.headers.get('access-token'),
+        client: response.headers.get('client'),
+        uid: response.headers.get('uid')
+      }
+
+      if (Object.values(tokens).every(Boolean)) {
+        Object.assign(this.tokenHeaders, tokens as Record<string, string>)
+        this.saveTokensToStorage(tokens as Record<string, string>)
       }
     },
-    clearTokenHeaders() {
+
+    loadTokensFromStorage() {
+      if (!import.meta.client) return
+
+      TOKEN_KEYS.forEach(key => {
+        this.tokenHeaders[key] = localStorage.getItem(key) || ''
+      })
+    },
+
+    saveTokensToStorage(tokens: Record<string, string>) {
+      if (!import.meta.client) return
+
+      Object.entries(tokens).forEach(([key, value]) => {
+        localStorage.setItem(key, value)
+      })
+    },
+
+    clearTokens() {
       TOKEN_KEYS.forEach(key => {
         this.tokenHeaders[key] = ''
+        if (import.meta.client) {
+          localStorage.removeItem(key)
+        }
       })
     }
   },
+
   persist: true
 })
