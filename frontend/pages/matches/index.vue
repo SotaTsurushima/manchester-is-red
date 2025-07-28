@@ -33,7 +33,18 @@
           No matches found for {{ selectedCompetition }}.
         </div>
         <div v-for="match in matches" :key="match.id">
-          <NuxtLink :to="`/matches/${match.id}`" class="block">
+          <NuxtLink
+            :to="{
+              path: `/matches/${match.id}`,
+              query: {
+                homeName: match.home_team?.name,
+                homeCrest: match.home_team?.crest_url,
+                awayName: match.away_team?.name,
+                awayCrest: match.away_team?.crest_url
+              }
+            }"
+            class="block"
+          >
             <div
               class="text-center match-item p-5 mb-4 rounded-lg bg-gray-800 text-white shadow-lg hover:shadow-2xl transition-all duration-200"
             >
