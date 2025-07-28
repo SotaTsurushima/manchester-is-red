@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_13_110508) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_28_150009) do
+  create_table "match_details", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "match_id", null: false
+    t.json "scorer_name"
+    t.json "assist_name"
+    t.json "additional_data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["match_id"], name: "index_match_details_on_match_id"
+  end
+
   create_table "matches", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "home_team_id", null: false
     t.bigint "away_team_id", null: false
@@ -76,6 +86,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_13_110508) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
+  add_foreign_key "match_details", "matches"
   add_foreign_key "matches", "teams", column: "away_team_id"
   add_foreign_key "matches", "teams", column: "home_team_id"
 end
