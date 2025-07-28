@@ -1,44 +1,44 @@
 <template>
   <Background>
-    <div class="max-w-screen-md mx-auto p-6 bg-gray-900 text-white rounded-lg shadow-lg">
-      <div v-if="loading">Loading...</div>
-      <div v-else-if="error">{{ error }}</div>
-      <div v-else>
-        <h2 class="text-2xl font-bold mb-4">
-          {{ match.home_team?.name }} vs {{ match.away_team?.name }}
-        </h2>
+    <div class="matches mx-auto p-5 max-w-screen-lg">
+      <div class="match-item bg-gray-800 text-white rounded-lg shadow-lg p-5 mb-4">
+        <div class="text-center text-sm text-gray-400 mb-2 text-left">
+          <div>Date: {{ formatDateTime(match.utc_date, 'date') }}</div>
+          <div v-if="match.referees && match.referees.length > 0">
+            Referee: {{ match.referees }}
+          </div>
+          <div v-if="match.venue">Venue: {{ match.venue }}</div>
+        </div>
+
         <div class="flex justify-between items-center mb-4">
-          <div class="flex items-center">
+          <div class="flex items-center flex-1">
             <img
-              v-if="match.home_team?.crest_url"
-              :src="match.home_team.crest_url"
+              v-if="homeCrest || match.home_team?.crest_url"
+              :src="homeCrest || match.home_team?.crest_url"
               alt="Home Team Crest"
               class="w-10 h-10 mr-2"
             />
-            <span class="text-xl font-semibold">{{ match.home_team?.name }}</span>
+            <span class="text-xl font-semibold">{{ homeName || match.home_team?.name }}</span>
           </div>
-          <div class="text-2xl font-bold">
-            {{ match.score }}
+          <div class="flex-none px-4">
+            <div class="text-2xl font-bold">
+              {{ match.score }}
+            </div>
           </div>
-          <div class="flex items-center">
-            <span class="text-xl font-semibold">{{ match.away_team?.name }}</span>
+          <div class="flex items-center flex-1 justify-end">
+            <span class="text-xl font-semibold">{{ awayName || match.away_team?.name }}</span>
             <img
-              v-if="match.away_team?.crest_url"
-              :src="match.away_team.crest_url"
+              v-if="awayCrest || match.away_team?.crest_url"
+              :src="awayCrest || match.away_team?.crest_url"
               alt="Away Team Crest"
               class="w-10 h-10 ml-2"
             />
           </div>
         </div>
-        <div class="mb-2">Date: {{ formatDateTime(match.utc_date, 'date') }}</div>
-        <div class="mb-2">Venue: {{ match.venue }}</div>
-        <div class="mb-2">Status: {{ match.status }}</div>
-        <div class="mb-2">Referee: {{ match.referees }}</div>
-        <div class="mb-2">Competition: {{ match.competition }}</div>
-        <div v-if="match.goals && match.goals.length > 0" class="mt-4">
+        <div v-if="match.goals && match.goals.length > 0" class="mt-6 text-sm">
           <h4 class="font-semibold mb-2">Goals:</h4>
-          <ul>
-            <li v-for="goal in match.goals" :key="goal.minute">
+          <ul class="space-y-1">
+            <li v-for="goal in match.goals" :key="goal.minute" class="text-center">
               {{ goal.minute }}' {{ goal.scorer }} ({{ goal.team }})
             </li>
           </ul>
@@ -49,8 +49,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
 import { useApi } from '../../composables/api'
 import Background from '../../components/Background.vue'
 
@@ -59,6 +58,11 @@ const api = useApi()
 const match = ref({})
 const loading = ref(true)
 const error = ref(null)
+
+const homeName = computed(() => route.query.homeName)
+const homeCrest = computed(() => route.query.homeCrest)
+const awayName = computed(() => route.query.awayName)
+const awayCrest = computed(() => route.query.awayCrest)
 
 function formatDateTime(utc_date, type = 'date') {
   const date = new Date(utc_date)
@@ -81,7 +85,6 @@ onMounted(async () => {
   try {
     const response = await api.get(`/matches/${route.params.id}`)
     match.value = response.match
-    console.log("🚀 ~ onMounted ~ response:", response)
   } catch (err) {
     error.value = 'Failed to load match details'
   } finally {
