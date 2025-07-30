@@ -68,6 +68,8 @@ module Matches
           match.status = result
           match.referees = referee
           match.save!
+
+          fetch_and_save_match_details(match, row)
         end
       end
     end
@@ -89,6 +91,15 @@ module Matches
           raise "Failed to fetch data from #{url}: #{e.message}"
         end
       end
+    end
+
+    def fetch_and_save_match_details(match, row)
+      match_link = row.at_css('th[data-stat="date"] a')&.[]('href')
+      return unless match_link
+
+      full_url = "https://fbref.com#{match_link}"
+      match_doc = fetch_with_retry(full_url)
+      Matches::MatchDetailsParser.new(match, match_doc).save_details
     end
   end
 end 
