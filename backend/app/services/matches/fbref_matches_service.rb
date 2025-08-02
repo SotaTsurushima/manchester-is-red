@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'open-uri'
+require 'set'
 
 module Matches
   class FbrefMatchesService
@@ -15,9 +16,14 @@ module Matches
     }.freeze
 
     def fetch_and_save_matches
+      processed_matches = Set.new
+      
       BASE_URLS.each do |competition, url|
+        puts "=== #{competition} の処理開始 ==="
         doc = fetch_with_retry(url)
         doc.css('table#matchlogs_for tbody tr').each do |row|
+          puts "行を処理中..."
+          
           date = row.at_css('th[data-stat="date"]')&.text&.strip
           time = row.at_css('td[data-stat="start_time"]')&.text&.strip
           competition_name = row.at_css('td[data-stat="comp"] a')&.text&.strip
@@ -30,8 +36,7 @@ module Matches
           opponent_name = row.at_css('td[data-stat="opponent"] a')&.text&.strip
           referee = row.at_css('td[data-stat="referee"]')&.text&.strip
 
-          # 必要な値が取得できているか確認
-          puts [date, time, competition_name, round, day, venue, result, goals_for, goals_against, opponent_name, referee].join(' | ')
+          puts "取得したデータ: #{date} | #{opponent_name} | #{competition_name}"
 
           next unless date && opponent_name
 
@@ -44,7 +49,7 @@ module Matches
             away_team_name = 'Manchester United'
           end
 
-          # 4. teamsテーブルにデータを保存（find_or_create_byで重複防止）
+          # teamsテーブルにデータを保存（find_or_create_byで重複防止）
           home_team = Team.find_or_create_by!(name: home_team_name)
           away_team = Team.find_or_create_by!(name: away_team_name)
 
@@ -56,7 +61,14 @@ module Matches
 
           next unless date_obj
 
-          # 5. matchesテーブルの保存時にteam_idを使う
+          # 処理済みかチェック
+          match_key = "#{date_obj}_#{competition_name}"
+          if processed_matches.include?(match_key)
+            puts "既に処理済みのマッチです（スキップ）: #{match_key}"
+            next
+          end
+
+          # matchesテーブルの保存時にteam_idを使う
           match = Match.find_or_initialize_by(
             utc_date: date_obj,
             competition: competition_name
@@ -68,8 +80,8 @@ module Matches
           match.status = result
           match.referees = referee
           match.save!
-
-          fetch_and_save_match_details(match, row)
+          
+          processed_matches.add(match_key)
         end
       end
     end
@@ -91,15 +103,6 @@ module Matches
           raise "Failed to fetch data from #{url}: #{e.message}"
         end
       end
-    end
-
-    def fetch_and_save_match_details(match, row)
-      match_link = row.at_css('th[data-stat="date"] a')&.[]('href')
-      return unless match_link
-
-      full_url = "https://fbref.com#{match_link}"
-      match_doc = fetch_with_retry(full_url)
-      Matches::MatchDetailsParser.new(match, match_doc).save_details
     end
   end
 end 
