@@ -28,6 +28,13 @@
           <span v-else>Run Teams Batch</span>
         </button>
       </div>
+
+      <!-- 処理状況表示エリア -->
+      <div v-if="processingStatus" class="mt-6 p-4 bg-gray-100 rounded">
+        <h3 class="font-semibold mb-2">処理状況</h3>
+        <p>{{ processingStatus }}</p>
+        <p class="text-sm text-gray-600 mt-2">処理完了まで数分かかる場合があります</p>
+      </div>
     </div>
   </Background>
 </template>
@@ -46,8 +53,12 @@ const loading = ref({
   teams: false
 })
 
+const processingStatus = ref('')
+
 const runBatch = async type => {
   loading.value[type] = true
+  processingStatus.value = 'バッチ処理を開始しました...'
+
   let endpoint = ''
   if (type === 'matches') endpoint = '/admin/batch/matches'
   if (type === 'players_stats') endpoint = '/admin/batch/players_stats'
@@ -57,11 +68,20 @@ const runBatch = async type => {
     const res = await api.post(endpoint)
     if (res.success) {
       ElMessage.success(res.message || 'Batch started successfully!')
+      processingStatus.value = '処理中です。完了までお待ちください...'
+
+      // 3秒後に完了メッセージを表示
+      setTimeout(() => {
+        processingStatus.value = '処理が完了しました！'
+        ElMessage.success('バッチ処理が完了しました')
+      }, 3000)
     } else {
       ElMessage.error(res.error || 'Failed to start batch.')
+      processingStatus.value = ''
     }
   } catch (e) {
     ElMessage.error(e.message || 'An error occurred while starting the batch.')
+    processingStatus.value = ''
   } finally {
     loading.value[type] = false
   }
