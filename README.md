@@ -53,8 +53,14 @@ backend/.env
 ```bash
 # Build containers
 make b
+
 # Run containers
 make u
+
+# prepare data
+make back
+rails db:migrate
+rails db:seed
 ```
 
 ### **4️⃣ Access the app**
