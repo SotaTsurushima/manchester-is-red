@@ -51,8 +51,10 @@ backend/.env
 
 ### **3️⃣ Build and run the containers**
 ```bash
-make b     # Build containers
-make u     # Run containers
+# Build containers
+make b
+# Run containers
+make u
 ```
 
 ### **4️⃣ Access the app**
