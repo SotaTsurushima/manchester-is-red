@@ -1,0 +1,18 @@
+{
+  "name": "api-spec",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsp compile . --emit @typespec/openapi3",
+    "watch": "tsp compile . --emit @typespec/openapi3 --watch",
+    "lint": "tsp format --check ."
+  },
+  "devDependencies": {
+    "@typespec/compiler": "^1.5.0",
+    "@typespec/http": "^1.5.0",
+    "@typespec/openapi": "^1.5.0",
+    "@typespec/openapi3": "^1.5.0",
+    "@typespec/rest": "^0.75.0"
+  }
+}
