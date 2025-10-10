@@ -51,13 +51,19 @@ backend/.env
 
 ### **3️⃣ Build and run the containers**
 ```bash
+# ----------------------------------------
+# 🏗️ Build and run the containers
+# ----------------------------------------
+
 # Build containers
 make b
 
 # Run containers
 make u
 
-# prepare data
+# ----------------------------------------
+# 🧰 Prepare database
+# ----------------------------------------
 make back
 rails db:migrate
 rails db:seed
