@@ -4,10 +4,11 @@ import "@typespec/openapi3";
 using Http;
 using Rest;
 
-// @service({ title: "Manchester API" })
+@service(#{ title: "Manchester API" })
 @server("http://localhost:8000", "Local Rails API")
 namespace Manchester;
 
+// モデル定義
 model User {
   id: string;
   name: string;
@@ -15,11 +16,12 @@ model User {
   age?: int32;
 }
 
+// APIルート
 @route("/api/users")
 interface Users {
-  list(): User[];
-  create(@body user: User): User;
-  read(@path id: string): User;
-  update(@path id: string, @body user: User): User;
-  delete(@path id: string): void;
+  @get list(): User[];
+  @post create(@body user: User): User;
+  @get read(@path id: string): User;
+  @put update(@path id: string, @body user: User): User;
+  @delete remove(@path id: string): void;
 }
