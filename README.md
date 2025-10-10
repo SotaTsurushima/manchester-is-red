@@ -34,19 +34,20 @@ A web application to track Manchester United matches, player information, and te
 ```bash
 git clone [repository-url]
 cd manchester-is-red
+make b
+make u
 ```
 
 2. Create environment files
 
 ```bash
 # Root directory
-cp .env.example .env
+get those from administrator
+- env 
+- frontend/env
+- backend/env
 
-# Frontend
-cp frontend/.env.example frontend/.env
 
-# Backend
-cp backend/.env.example backend/.env
 ```
 
 3. Add your Football Data API key to `backend/.env`
