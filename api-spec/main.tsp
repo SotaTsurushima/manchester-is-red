@@ -4,8 +4,8 @@ import "@typespec/openapi3";
 using Http;
 using Rest;
 
-@service(#{ title: "Manchester API" })
-@server("http://localhost:8000", "Local Rails API")
+@service(#{ title: "Manchester United API" })
+@server("http://localhost:8000", "Rails API")
 namespace Manchester;
 
 // モデル定義
