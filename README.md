@@ -1,62 +1,68 @@
+<div align="center">
+
 ![My Skills](https://skillicons.dev/icons?i=docker,ruby,rails,vue,nuxtjs,tailwind,vite,redis,github,mysql&perline=5)
 
+# ⚽ Manchester United Match Tracker
 
+**A web app to track Manchester United matches, player info, and team news — built with Nuxt 3 × Rails 8 × Docker.**
 
-# Manchester United Match Tracker
+</div>
 
-A web application to track Manchester United matches, player information, and team news using the Football Data API.
+---
 
-## Features
+## 🚀 Overview
 
-- Match schedule and results
-- Player information
-- Team news from Sky Sports
-- Competition filtering (Premier League, Champions League)
+**Manchester United Match Tracker** is a full-stack web application that lets fans easily follow:
+- 🏟️ Upcoming & past match results  
+- 👕 Player profiles & stats  
+- 📰 Latest team news from **Sky Sports**  
+- 🏆 Competition filtering (Premier League, Champions League, etc.)
 
-## Tech Stack
+---
 
-- **Frontend**: Vue.js/Nuxt.js 3.5.13/3.16.2
-- **Backend**: Ruby on Rails 8.0.2
-- **Database**: MySQL 8.0
-- **Storage**: Minio 
-- **Container**: Docker 3.8
+## 🧩 Tech Stack
 
-## Prerequisites
+| Layer | Technology |
+|-------|-------------|
+| **Frontend** | Nuxt.js (Vue 3, TypeScript) / Tailwind CSS / Vite |
+| **Backend** | Ruby on Rails 8.0.2 |
+| **Database** | MySQL 8.0 |
+| **Cache/Queue** | Redis |
+| **Storage** | MinIO (S3 compatible) |
+| **Containerization** | Docker 3.8 |
 
-- Docker
-- Docker Compose
-- Football Data API Key
+---
 
-## Setup
+## ⚙️ Setup
 
-1. Clone the repository
+### **1️⃣ Clone the repository**
 
 ```bash
 git clone [repository-url]
 cd manchester-is-red
-make b
-make u
 ```
 
-2. Create environment files
-
+### **2️⃣ Configure environment variables**
 ```bash
-# Root directory
-get those from administrator
-- env 
-- frontend/env
-- backend/env
-
-
+.env
+frontend/.env
+backend/.env
 ```
 
-3. Add your Football Data API key to `backend/.env`
+### **3️⃣ Build and run the containers**
+```bash
+make b     # Build containers
+make u     # Run containers
+```
 
-## Notes
+### **4️⃣ Access the app**
+```bash
+Frontend → http://localhost:3000
+Backend API → http://localhost:8000
+```
 
-- MinIO/S3 integration and image deletion permissions are described in the README or code comments.
-- For detailed API specs or customization, see the `/docs` directory or code comments.
 
----
-
-**Questions and contributions are welcome!**
+### **5️⃣ (Optional) Stop and remove containers**
+```bash
+make down
+```
