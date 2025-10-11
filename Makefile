@@ -22,12 +22,6 @@ destroy-volumes:
 	docker compose down --volumes --remove-orphans
 ps:
 	docker compose ps
-logs:
-	docker compose logs
-log-app:
-	docker compose logs app
-log-app-watch:
-	docker compose logs --follow app
 front:
 	docker compose exec frontend bash
 back:
@@ -40,6 +34,8 @@ bundle:
 	docker compose run backend bundle install -j 4
 rubocop:
 	docker compose exec backend bundle exec rubocop -A
+rspec:
+	docker compose exec backend rails rspec
 cleanup:
 	docker compose down -v
 dsu:
