@@ -30,8 +30,23 @@
 | **Cache/Queue** | Redis |
 | **Storage** | MinIO (S3 compatible) |
 | **Containerization** | Docker 3.8 |
+| **API Documentation** | Swagger UI / TypeSpec |
+
 
 ---
+
+## 📘 API Documentation
+
+### Swagger UI
+- Location: `http://localhost:8000/api-docs`
+- Tool: [swagger-ui](https://swagger.io/tools/swagger-ui/)
+- Generated automatically from OpenAPI spec via Rails (`rswag` or `grape-swagger`)
+
+### TypeSpec (API Spec)
+- Directory: `/api-spec`
+- Command to preview:  
+  ```bash
+  yarn api:preview
 
 ## ⚙️ Setup
 
