@@ -1,11 +1,21 @@
 require:
   - rubocop-rails
+  - rubocop-performance
+  - rubocop-rspec
 
 AllCops:
   TargetRubyVersion: 3.2
   NewCops: enable
   Exclude:
+    - 'bin/**/*'
+    - 'node_modules/**/*'
+    - 'vendor/**/*'
+    - 'tmp/**/*'
     - 'db/schema.rb'
+    - 'db/seeds.rb'
+    # ルーティングやマイグレーションは自動修正で壊しやすいので除外推奨
+    - 'config/routes.rb'
+    - 'db/migrate/**/*'
 
 Layout/LineLength:
   Max: 120
@@ -15,6 +25,14 @@ Style/FrozenStringLiteralComment:
 
 Metrics/MethodLength:
   Max: 20
+
+# 大きめブロックはspecやRake、routesでは許容
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'db/**/*'
+    - 'config/routes.rb'
+    - 'lib/tasks/**/*.rake'
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
@@ -28,3 +46,69 @@ Layout/ArgumentAlignment:
 Layout/ExtraSpacing:
   Enabled: true
   AllowForAlignment: false
+
+Style/Documentation:
+  Enabled: false  # クラス/モジュールに必ずYARDコメントを要求しない
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: true
+
+# ---- Rails系（事故防止・ベストプラクティス） ----
+Rails/SaveBang:
+  Enabled: true   # 失敗時に気づけるよう save → save! を促す
+Rails/SkipsModelValidations:
+  Enabled: true   # update_all / toggle などのバリデーション回避を注意
+Rails/FindBy:
+  Enabled: true   # where(...).first → find_by(...)
+Rails/Blank:
+  Enabled: true   # empty?/nil? の複合より blank?/present? を推奨
+Rails/Present:
+  Enabled: true
+Rails/HttpStatus:
+  EnforcedStyle: symbolic  # 200ではなく :ok を推奨
+Rails/Delegate:
+  Enabled: true   # foo.bar.baz を delegate で短縮
+Rails/Pluck:
+  Enabled: true   # map(&:attr) より pluck(:attr) を推奨（AR）
+Rails/WhereExists:
+  Enabled: true
+Rails/HasManyOrHasOneDependent:
+  Enabled: true   # dependent: :destroy 等の付け忘れ検知
+Rails/InverseOf:
+  Enabled: true
+Rails/UniqueValidationWithoutIndex:
+  Enabled: true   # DBユニークインデックスの不足を警告
+Rails/I18nLocaleTexts:
+  Enabled: true   # ビューに直書き文言を避けてi18nへ
+
+# ---- Performance（地味に効く） ----
+Performance/Casecmp:
+  Enabled: true
+Performance/FixedSize:
+  Enabled: true
+Performance/RedundantEqualityComparisonBlock:
+  Enabled: true
+Performance/StartWith:
+  Enabled: true
+Performance/EndWith:
+  Enabled: true
+
+# ---- RSpec（使っているなら強く推奨） ----
+RSpec/ExampleLength:
+  Max: 15
+RSpec/MultipleExpectations:
+  Max: 3
+RSpec/NestedGroups:
+  Max: 3
+RSpec/NamedSubject:
+  Enabled: true
+RSpec/ImplicitSubject:
+  Enabled: false
+RSpec/LetSetup:
+  Enabled: false   # letでセットアップを強制しない（好み）
+
+# ---- あると便利な命名・可読性 ----
+Naming/PredicateName:
+  Enabled: true    # メソッド名は has_?/is_? より末尾 ? を推奨
+Naming/MemoizedInstanceVariableName:
+  Enabled: true
