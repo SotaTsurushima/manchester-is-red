@@ -7,9 +7,10 @@ module PlayerBatch
     include Interactor
     include Retry
     include NameNormalizer
+    # include TransfermarktStatsService
     
-    BATCH_SIZE = 5
-    BATCH_WAIT_TIME = 30
+    BATCH_SIZE = 3
+    BATCH_WAIT_TIME = 60
     STATS_MAPPING = {
       appearances: 'games',
       goals: 'goals',
@@ -43,7 +44,8 @@ module PlayerBatch
       normalized_name = normalize_name(name)
       return if context.processed_players.include?(normalized_name)
       
-      player = find_player_by_name(name)
+      # プレイヤーを探すか作成
+      player = find_or_create_player(name)
       return unless player
       
       link = @current_row.css('th a').first['href']
@@ -78,7 +80,6 @@ module PlayerBatch
     
     def update_player_stats?(player, link)
       new_stats = fetch_new_stats
-      salary = fetch_player_salary(link)
       update_params = new_stats.merge(salary: salary)
       
       if stats_changed?(player, update_params)
@@ -98,23 +99,74 @@ module PlayerBatch
       end
     end
     
-    def fetch_player_salary(player_url)
-      return 0 unless player_url
-      
-      full_url = "https://fbref.com#{player_url}"
-      player_doc = fetch_with_retry(full_url)
-      text = player_doc.at_css("div#meta div:contains('Wages')")&.text&.strip
-      
-      if text && (match = text.match(/[£￡]\s*(\d+\.?\d*)/))
-        match[1].to_f.to_i
-      else
-        0
-      end
-    end
-    
     def stats_changed?(player, new_stats)
       changes = new_stats.select { |key, value| player.send(key).to_i != value.to_i }
       changes.any?
+    end
+
+    def find_or_create_player(name)
+      link = @current_row.css('th a').first['href']
+      player_doc = fetch_with_retry("https://fbref.com#{link}")
+
+      # market_values = fetch_market_values(name)
+      # puts "market_values: #{market_values}"
+      
+      # デバッグ情報を出力
+      puts "=== プレイヤー作成デバッグ ==="
+      puts "Name: #{name}"
+      puts "Number: #{extract_player_number}"
+      
+      # 名前で探す、見つからなければ作成
+      player = Player.find_or_create_by(name: name) do |p|
+        p.number = number || 0
+        p.position = extract_position || "Unknown"
+        p.image = extract_image(player_doc) || ""
+        p.goals = 0
+        p.assists = 0
+        p.yellow_card = 0
+        p.red_card = 0
+        p.appearances = 0
+        p.market_value = 0
+        p.salary = 0
+      end
+      
+      if player.persisted?
+        puts "プレイヤー作成成功: #{player.name}"
+      else
+        puts "プレイヤー作成失敗: #{player.errors.full_messages}"
+      end
+      
+      player
+    rescue => e
+      Rails.logger.error "プレイヤー #{name} の作成に失敗しました: #{e.message}"
+      puts "エラー: #{e.message}"
+      nil
+    end
+
+    def fetch_player_basic_info(player_url)
+      return { image: nil } unless player_url
+      
+      full_url = "https://fbref.com#{player_url}"
+      player_doc = fetch_with_retry(full_url)
+
+      { image: extract_image(player_doc) }
+    rescue => e
+      Rails.logger.error "プレイヤー情報の取得に失敗しました: #{e.message}"
+      { image: nil }
+    end
+
+    def extract_player_number
+      number_cell = @current_row.css('td[data-stat="number"]').text.strip
+      number_cell.to_i if number_cell.match?(/^\d+$/)
+    end
+
+    def extract_position
+      position_element = @current_row.at_css('td[data-stat="position"]').text.strip
+    end
+
+    def extract_image(doc)
+      img_element = doc.at_css("div#meta img")
+      img_element&.[]('src')
     end
   end
 end
