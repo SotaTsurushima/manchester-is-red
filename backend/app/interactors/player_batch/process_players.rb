@@ -6,6 +6,7 @@ module PlayerBatch
   class ProcessPlayers
     include Interactor
     include Retry
+    include NameNormalizer
     
     BATCH_SIZE = 5
     BATCH_WAIT_TIME = 30
@@ -34,6 +35,9 @@ module PlayerBatch
     end
     
     def process_player(row)
+      puts "--------------------------------"
+      puts "row: #{row}"
+      puts "--------------------------------"
       return if row.css('th').empty?
       
       name = row.css('th a').text.strip
@@ -112,10 +116,6 @@ module PlayerBatch
     def stats_changed?(player, new_stats)
       changes = new_stats.select { |key, value| player.send(key).to_i != value.to_i }
       changes.any?
-    end
-    
-    def normalize_name(name)
-      NameNormalizer.normalize_name(name)
     end
   end
 end

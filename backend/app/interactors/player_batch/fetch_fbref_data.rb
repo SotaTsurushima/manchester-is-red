@@ -10,7 +10,7 @@ module PlayerBatch
     
     def call
       context.rows = fetch_player_rows
-      # ProcessPlayersを直接呼び出し
+      
       process_result = ProcessPlayers.call(rows: context.rows)
       
       if process_result.success?
@@ -26,7 +26,6 @@ module PlayerBatch
     private
     
     def fetch_player_rows
-      Rails.logger.info "hanakuso hojihoji"
       doc = fetch_with_retry(FBREF_URL)
       doc.css('table#stats_standard_9 tbody tr')
     end
