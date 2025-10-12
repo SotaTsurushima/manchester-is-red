@@ -35,20 +35,19 @@ module PlayerBatch
     end
     
     def process_player(row)
-      puts "--------------------------------"
-      puts "row: #{row}"
-      puts "--------------------------------"
-      return if row.css('th').empty?
+      @current_row = row
       
-      name = row.css('th a').text.strip
+      return if @current_row.css('th').empty?
+      
+      name = @current_row.css('th a').text.strip
       normalized_name = normalize_name(name)
       return if context.processed_players.include?(normalized_name)
       
       player = find_player_by_name(name)
       return unless player
       
-      link = row.css('th a').first['href']
-      if update_player_stats(player, row, link)
+      link = @current_row.css('th a').first['href']
+      if update_player_stats?(player, link)
         context.updated_count += 1
       end
       
@@ -77,8 +76,8 @@ module PlayerBatch
       end
     end
     
-    def update_player_stats(player, row, link)
-      new_stats = fetch_new_stats(row)
+    def update_player_stats?(player, link)
+      new_stats = fetch_new_stats
       salary = fetch_player_salary(link)
       update_params = new_stats.merge(salary: salary)
       
@@ -93,9 +92,9 @@ module PlayerBatch
       false
     end
     
-    def fetch_new_stats(row)
+    def fetch_new_stats
       STATS_MAPPING.transform_values do |stat_key|
-        row.css("td[data-stat='#{stat_key}']").text.to_i
+        @current_row.css("td[data-stat='#{stat_key}']").text.to_i
       end
     end
     
