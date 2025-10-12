@@ -9,7 +9,6 @@ if Rails.env.development? && defined?(Rails::Console)
   listener = Listen.to(*roots) do |_modified, _added, _removed|
     begin
       Rails.autoloaders.main.reload
-      puts "🔁 Code reloaded at #{Time.now}"
     rescue => e
       warn "⚠️ Reload failed: #{e.class}: #{e.message}"
     end
