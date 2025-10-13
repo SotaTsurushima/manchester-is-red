@@ -106,7 +106,8 @@ RSpec.describe PlayerBatch::ProcessPlayers do
       allow(interactor).to receive(:extract_player_number).and_return(nil)
       allow(interactor).to receive(:extract_market_value).and_return(nil)
       allow(interactor).to receive(:extract_player_salary).and_return(nil)
-      allow(interactor).to receive(:extract_image).and_return('image.jpg')
+      allow(interactor).to receive(:extract_image).and_return(allow(interactor)
+        .to receive(:extract_image).and_return('image.jpg'))
       
       # 有効な名前を使用
       expect { interactor.send(:create_player, 'Bruno Fernandes') }.not_to raise_error
