@@ -14,13 +14,13 @@ module PlayerBatch
       process_result = ProcessPlayers.call(rows: context.rows)
       
       if process_result.success?
-        Rails.logger.info "=== プレイヤー処理完了: #{process_result.updated_count}件更新 ==="
+        Rails.logger.info "=== playerデータの取得完了: #{process_result.updated_count}件更新 ==="
         context.updated_count = process_result.updated_count
       else
-        context.fail!(error: "プレイヤー処理に失敗しました: #{process_result.error}")
+        context.fail!(error: "playerデータの取得に失敗しました: #{process_result.error}")
       end
     rescue => e
-      context.fail!(error: "FBrefデータの取得に失敗しました: #{e.message}")
+      context.fail!(error: "playerデータの取得に失敗しました: #{e.message}")
     end
     
     private
