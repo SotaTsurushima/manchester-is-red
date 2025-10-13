@@ -46,16 +46,21 @@ module PlayerBatch
       fetch_docs(name)
       @stats = extract_stats
 
+      puts "player: #{name}"
+
       if player
-        puts "既存プレイヤーがいるので更新"
+        puts "更新"
         update_player(player)
       else
-        puts "既存プレイヤーがいないので新規作成"
+        puts "新規作成"
         create_player(player)
       end
       
       context.updated_count += 1
       context.processed_players << normalized_name
+    rescue => e
+      puts "❌ プレイヤー #{name} の処理でエラー: #{e.message}"
+      Rails.logger.error "Player processing failed for #{name}: #{e.message}"
     end
 
     def find_player_by_name(fbref_name)
@@ -65,32 +70,30 @@ module PlayerBatch
     def create_player(name)
       Player.create!(
         name: name,
-        number: extract_player_number(@markt_doc) || 0,
+        number: extract_player_number || 0,
         position: @stats[:position] || "Unknown",
-        image: extract_image(@fbref_player_doc) || "",
+        image: extract_image || "",
         goals: @stats[:goals] || 0,
         assists: @stats[:assists] || 0,
         yellow_card: @stats[:yellow_card] || 0,
         red_card: @stats[:red_card] || 0,
         appearances: @stats[:appearances] || 0,
-        market_value: extract_market_value(@markt_doc) || 0,
-        salary: 0
+        market_value: extract_market_value || 0,
+        salary: extract_player_salary || 0
       )
     end
     
     def update_player(player)
-      puts "New Stats: #{@stats}"
-      
       player.update!(
-        number: extract_player_number(@markt_doc) || player.number,
+        number: extract_player_number || player.number,
         position: @stats[:position] || player.position,
-        appearances: @stats[:appearances],
-        goals: @stats[:goals],
-        assists: @stats[:assists],
-        yellow_card: @stats[:yellow_card],
-        red_card: @stats[:red_card],
-        market_value: extract_market_value(@markt_doc) || player.market_value,
-        salary: 0
+        appearances: @stats[:appearances] || player.appearances,
+        goals: @stats[:goals] || player.goals,
+        assists: @stats[:assists] || player.assists,
+        yellow_card: @stats[:yellow_card] || player.yellow_card,
+        red_card: @stats[:red_card] || player.red_card,
+        market_value: extract_market_value || player.market_value,
+        salary: extract_player_salary || player.salary
       )
     end
 
@@ -106,7 +109,6 @@ module PlayerBatch
       
       # 検索結果から該当プレイヤーを探す
       player_link = find_player_link(doc, player_name)
-      return nil unless player_link
       player_doc = fetch_with_retry(player_link, 2)
     end
 
@@ -114,7 +116,6 @@ module PlayerBatch
       # 検索結果から該当プレイヤーのリンクを探す
       doc.css('table.items tbody tr').each do |row|
         name_cell = row.at_css('td.hauptlink a')
-        next unless name_cell
         
         if normalize_name(name_cell.text.strip) == normalize_name(player_name)
           return "https://www.transfermarkt.com#{name_cell['href']}"
@@ -138,21 +139,31 @@ module PlayerBatch
       end
     end
 
-    def extract_image(doc)
-      img_element = doc.at_css("div#meta img")
+    def extract_image
+      img_element = @fbref_player_doc.at_css("div#meta img")
       img_element&.[]('src')
     end
 
-    def extract_player_number(doc)
-      shirt_number_element = doc.at_css('.data-header__shirt-number')
+    def extract_player_salary
+      text = @fbref_player_doc.at_css("div#meta div:contains('Wages')")&.text&.strip
+      
+      if text && (match = text.match(/[£￡]\s*(\d+\.?\d*)/))
+        match[1].to_f.to_i
+      else
+        0
+      end
+    end
+
+    def extract_player_number
+      shirt_number_element = @markt_doc.at_css('.data-header__shirt-number')
       return nil unless shirt_number_element
       
       number_text = shirt_number_element.text.strip
       number_text.gsub(/[#\s]/, '').strip
     end
 
-    def extract_market_value(doc)
-      market_value_wrapper = doc.at_css('.data-header__market-value-wrapper')
+    def extract_market_value
+      market_value_wrapper = @markt_doc.at_css('.data-header__market-value-wrapper')
       return nil unless market_value_wrapper
       
       # 子要素を順番に処理
@@ -162,16 +173,22 @@ module PlayerBatch
       # テキストノードから数値を抽出
       text_content = market_value_wrapper.text.strip
       market_value = parse_market_value(text_content)
-      market_value.to_i
     end
 
     def parse_market_value(value_str)
-      if value_str.match?(/€[\d\.,]+m/i)
-        value_str.gsub(/[€m,]/i, '').to_f * 1_000_000
-      elsif value_str.match?(/€[\d\.,]+k/i)
-        value_str.gsub(/[€k,]/i, '').to_f * 1_000
+      # 数値部分だけを抽出
+      numeric = value_str.gsub(/[^\d\.]/, '').to_f
+    
+      # すでに大きい値なら桁を調整（例: 60000000 → 60）
+      case numeric
+      when 1_000_000_000..Float::INFINITY
+        (numeric / 1_000_000_000).to_i   # billion → 例: 6_000_000_000 → 6
+      when 1_000_000..999_999_999
+        (numeric / 1_000_000).to_i       # million → 例: 60_000_000 → 60
+      when 1_000..999_999
+        (numeric / 1_000).to_i           # thousand → 例: 450_000 → 450
       else
-        nil
+        numeric.to_i                     # そのまま
       end
     end
   end
