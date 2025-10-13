@@ -14,5 +14,6 @@ module NameNormalizer
         .gsub(/[ýỳŷÿ]/, 'y')
         .gsub(/[ñ]/, 'n')
         .gsub(/[ç]/, 'c')
+        .gsub(/[š]/, 's')
   end
 end
